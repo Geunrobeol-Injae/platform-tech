@@ -21,7 +21,9 @@ public class LocationConfig {
     // TODO inject from external file(s).
     private final String AWS_REGION_NAME = "us-east-1";
     private final String AWS_KINESIS_STREAM_NAME = "scan_ble";
-    public static final String TOPIC_POSITION = "/loc/pos";
+
+    public static final String WS_POSITION_TOPIC = "/loc/pos";
+    public static final long WS_POSITION_DELAYS = 2000L;
 
     @Bean
     public ThreadPoolTaskExecutor taskExecutor() {

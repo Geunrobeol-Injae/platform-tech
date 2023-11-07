@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Example</title>
+    <script src="/js/sockjs.min.js"></script>
+    <script src="/js/stomp.min.js"></script>
+</head>
+<body>
+
+<h1>Location Logs</h1>
+<ul id="messages"></ul>
+
+<script>
+const socket = new SockJS("/ws");
+const stompClient = Stomp.over(socket);
+
+stompClient.connect({}, () => {
+    appendLog("WebSocket connection opened");
+
+    // Subscribe to a specific WebSocket topic
+    stompClient.subscribe("/loc/pos", (message) => {
+        console.log(message, message.body);
+        appendLog(JSON.parse(message.body));
+    });
+});
+
+socket.onclose = () => {
+    appendLog("WebSocket connection closed\nReload Again");
+};
+
+function appendLog(message) {
+    const messageDiv = document.createElement("li");
+    messageDiv.textContent = message;
+    document.getElementById("messages").appendChild(messageDiv);
+}
+</script>
+</body>
+</html>
