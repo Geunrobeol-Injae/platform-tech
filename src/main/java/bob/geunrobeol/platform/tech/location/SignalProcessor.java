@@ -29,6 +29,9 @@ public class SignalProcessor implements ShardRecordProcessor {
     private String shardId;
 
     @Autowired
+    private LocationPrivacyPublisher locationPrivacyPublisher;
+
+    @Autowired
     private ILocationPreprocessor locationPreprocessor;
 
     @Autowired
@@ -56,9 +59,6 @@ public class SignalProcessor implements ShardRecordProcessor {
                 byte[] bytes = new byte[r.data().remaining()];
                 r.data().get(bytes);
                 ScannerRecord record = objectMapper.readValue(bytes, ScannerRecord.class);
-
-                log.info("scannerRecord: {}", record.toString());
-
                 locationPreprocessor.pushScanRecord(record);
             }
 

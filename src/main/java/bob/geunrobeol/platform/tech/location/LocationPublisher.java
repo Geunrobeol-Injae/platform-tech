@@ -15,6 +15,7 @@ import java.util.List;
 import bob.geunrobeol.platform.tech.config.LocationConfig;
 import bob.geunrobeol.platform.tech.vo.BeaconRecord;
 import bob.geunrobeol.platform.tech.vo.PositionRecord;
+import bob.geunrobeol.platform.tech.vo.ScannerRecord;
 
 @Service
 public class LocationPublisher {
@@ -38,7 +39,7 @@ public class LocationPublisher {
 
         String msg = "[]";
         try {
-            objectMapper.writeValueAsString(positions);
+            msg = objectMapper.writeValueAsString(positions);
         } catch (JsonProcessingException e) {
             log.error("json.writeValue.error", e);
         }

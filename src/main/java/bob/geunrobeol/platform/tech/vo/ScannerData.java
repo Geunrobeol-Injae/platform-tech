@@ -1,17 +1,14 @@
 package bob.geunrobeol.platform.tech.vo;
 
-import java.util.List;
-import java.util.Map;
-
-public class ScannerRecord {
+public class ScannerData {
     private long timestamp;
     private String scannerId;
-    private List<BeaconData> beacons;
+    private int rssi;
 
-    public ScannerRecord(long timestamp, String scannerId, List<BeaconData> beacons) {
+    public ScannerData(long timestamp, String scannerId, int rssi) {
         this.timestamp = timestamp;
         this.scannerId = scannerId;
-        this.beacons = beacons;
+        this.rssi = rssi;
     }
 
     public long getTimestamp() {
@@ -30,20 +27,20 @@ public class ScannerRecord {
         this.scannerId = scannerId;
     }
 
-    public List<BeaconData> getBeacons() {
-        return beacons;
+    public int getRssi() {
+        return rssi;
     }
 
-    public void setBeacons(List<BeaconData> beacons) {
-        this.beacons = beacons;
+    public void setRssi(int rssi) {
+        this.rssi = rssi;
     }
 
     @Override
     public String toString() {
-        return "ScannerRecord{" +
+        return "ScannerData{" +
                 "timestamp=" + timestamp +
                 ", scannerId='" + scannerId + '\'' +
-                ", beacons=" + beacons +
+                ", rssi=" + rssi +
                 '}';
     }
 }

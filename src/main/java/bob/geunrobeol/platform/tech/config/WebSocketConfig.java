@@ -17,6 +17,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker(LocationConfig.WS_POSITION_TOPIC);
+        config.enableSimpleBroker(
+                LocationConfig.WS_SCANNER_TOPIC,
+                LocationConfig.WS_PSUDONYM_TOPIC,
+                LocationConfig.WS_POSITION_TOPIC);
     }
 }

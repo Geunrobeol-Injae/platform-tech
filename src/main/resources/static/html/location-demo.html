@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Location Demo</title>
+
+    <script src="/js/sockjs.min.js"></script>
+    <script src="/js/stomp.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        .header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .container {
+            display: flex;
+        }
+
+        .column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            width: 33%;
+            border: 1px solid #ddd;
+            background-color: #fff;
+        }
+
+        .column h2 {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            margin: 0;
+            padding: 10px;
+        }
+
+        .column-content {
+            padding: 10px;
+            overflow-y: auto;
+            height: 70vh;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>Location Privacy-preserving Technology</h1>
+</div>
+<div class="container">
+    <div class="column">
+        <h2>스캐너 신호</h2>
+        <pre id="scanner" class="column-content"></pre>
+    </div>
+    <div class="column">
+        <h2>전처리 및 가명화</h2>
+        <pre id="psudonym" class="column-content"></pre>
+    </div>
+    <div class="column">
+        <h2>위치 추정</h2>
+        <pre id="position" class="column-content"></pre>
+    </div>
+</div>
+
+<script>
+function stompClient(endpoint, destination, callback) {
+    var socket = new SockJS(endpoint);
+    var stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function (frame) {
+        stompClient.subscribe(destination, callback);
+    });
+
+    return stompClient;
+}
+
+function beautify(jsonMsg) {
+    return JSON.stringify(JSON.parse(jsonMsg), null, 2);
+}
+
+const scClient = stompClient("/ws", "/loc/sc", (message) => {
+    document.getElementById("scanner").textContent += beautify(message.body) + "\n";
+});
+
+const scClient = stompClient("/ws", "/loc/sc", (message) => {
+    document.getElementById("scanner").textContent += message.body + "\n";
+});
+
+const posClient = stompClient("/ws", "/loc/pos", (message) => {
+    document.getElementById("position").textContent += beautify(message.body) + "\n";
+});
+</script>
+</body>
+</html>
