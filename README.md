@@ -1,6 +1,6 @@
 # Platform Technology
 
-| Privacy-preserving Technologies for Workers
+> Privacy-preserving Technologies for Workers
 
 ## Video
 
