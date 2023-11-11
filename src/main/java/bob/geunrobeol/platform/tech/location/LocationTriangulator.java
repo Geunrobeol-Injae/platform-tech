@@ -22,7 +22,7 @@ public class LocationTriangulator implements ILocationEstimator {
                 .max(Comparator.naturalOrder())
                 .orElse(System.currentTimeMillis());
         Map<String, Integer> payloads = reducePayload(beaconRecord.getScannerPayloads());
-        Map.Entry<Long, Long> xy = estimateLocation(beaconRecord.getScanners());
+        Map.Entry<Long, Long> xy = estimatePosition(beaconRecord.getScanners());
 
         return new PositionRecord(timestamp, beaconRecord.getPseudonym(), payloads, xy.getKey(), xy.getValue());
     }
@@ -38,7 +38,7 @@ public class LocationTriangulator implements ILocationEstimator {
         return payloads;
     }
 
-    private Map.Entry<Long, Long> estimateLocation(List<ScannerData> scanners) {
+    private Map.Entry<Long, Long> estimatePosition(List<ScannerData> scanners) {
         long x = 0, y = 0;
 
         // TODO estimateLocation

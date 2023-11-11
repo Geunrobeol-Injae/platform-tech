@@ -1,5 +1,7 @@
 package bob.geunrobeol.platform.tech.vo;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -7,6 +9,10 @@ public class BeaconRecord {
     private String pseudonym;
     private Map<Long, Map<String, Integer>> scannerPayloads;
     private List<ScannerData> scanners;
+
+    public BeaconRecord() {
+        this("", new HashMap<>(), new ArrayList<>());
+    }
 
     public BeaconRecord(String pseudonym, Map<Long, Map<String, Integer>> scannerPayloads, List<ScannerData> scanners) {
         this.pseudonym = pseudonym;
@@ -26,8 +32,8 @@ public class BeaconRecord {
         return scannerPayloads;
     }
 
-    public void setScannerPayloads(Map<Long, Map<String, Integer>> scannerPayloads) {
-        this.scannerPayloads = scannerPayloads;
+    public void putScannerPayloads(long timestamp, Map<String, Integer> payloads) {
+        scannerPayloads.put(timestamp, payloads);
     }
 
     public List<ScannerData> getScanners() {

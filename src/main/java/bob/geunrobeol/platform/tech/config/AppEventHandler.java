@@ -22,9 +22,6 @@ public class AppEventHandler {
 
     @EventListener
     public void handleApplicationStartedEvent(ApplicationStartedEvent event) {
-        log.info("ApplicationStartedEvent");
         taskExecutor.execute(clientScheduler);
     }
-
-
 }

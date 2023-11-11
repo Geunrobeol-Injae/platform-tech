@@ -1,7 +1,6 @@
 package bob.geunrobeol.platform.tech.vo;
 
 import java.util.List;
-import java.util.Map;
 
 public class ScannerRecord {
     private long timestamp;

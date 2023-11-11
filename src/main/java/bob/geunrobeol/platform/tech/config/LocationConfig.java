@@ -23,7 +23,6 @@ public class LocationConfig {
     private final String AWS_KINESIS_STREAM_NAME = "scan_ble";
 
     public static final String WS_SCANNER_TOPIC = "/loc/sc";
-    public static final String WS_PSUDONYM_TOPIC = "/loc/ps";
     public static final String WS_POSITION_TOPIC = "/loc/pos";
     public static final long WS_POSITION_DELAYS = 2000L;
 

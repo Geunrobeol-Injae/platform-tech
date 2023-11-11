@@ -32,6 +32,17 @@ public class LocationPublisher {
     @Autowired
     private ILocationEstimator locationEstimator;
 
+    public void publishScanner(ScannerRecord record) {
+        String msg = "{}";
+        try {
+            msg = objectMapper.writeValueAsString(record);
+        } catch (JsonProcessingException e) {
+            log.error("json.writeValue.error", e);
+        }
+
+        messagingTemplate.convertAndSend(LocationConfig.WS_SCANNER_TOPIC, msg);
+    }
+
     @Scheduled(fixedDelay = LocationConfig.WS_POSITION_DELAYS)
     public void publishPositions() {
         List<BeaconRecord> records = locationPreprocessor.popBeaconRecord();

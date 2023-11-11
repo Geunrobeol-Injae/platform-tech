@@ -1,6 +1,5 @@
 package bob.geunrobeol.platform.tech.location;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.slf4j.Logger;
@@ -29,7 +28,7 @@ public class SignalProcessor implements ShardRecordProcessor {
     private String shardId;
 
     @Autowired
-    private LocationPrivacyPublisher locationPrivacyPublisher;
+    private LocationPublisher locationPublisher;
 
     @Autowired
     private ILocationPreprocessor locationPreprocessor;
@@ -53,12 +52,12 @@ public class SignalProcessor implements ShardRecordProcessor {
         MDC.put(SHARD_ID_MDC_KEY, shardId);
         try {
             log.info("Processing {} record(s)", processRecordsInput.records().size());
-            // processRecordsInput.records().forEach(r -> log.info("Processing record pk: {} -- Seq: {} -- Data: {}", r.partitionKey(), r.sequenceNumber(), r.data()));
 
             for (KinesisClientRecord r : processRecordsInput.records()) {
                 byte[] bytes = new byte[r.data().remaining()];
                 r.data().get(bytes);
                 ScannerRecord record = objectMapper.readValue(bytes, ScannerRecord.class);
+                locationPublisher.publishScanner(record);
                 locationPreprocessor.pushScanRecord(record);
             }
 

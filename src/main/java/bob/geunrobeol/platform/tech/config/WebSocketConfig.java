@@ -19,7 +19,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureMessageBroker(MessageBrokerRegistry config) {
         config.enableSimpleBroker(
                 LocationConfig.WS_SCANNER_TOPIC,
-                LocationConfig.WS_PSUDONYM_TOPIC,
+                LocationPrivacyConfig.WS_PSUDONYM_TOPIC,
                 LocationConfig.WS_POSITION_TOPIC);
     }
 }
