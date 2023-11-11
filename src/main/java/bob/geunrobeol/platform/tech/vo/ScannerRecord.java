@@ -2,6 +2,12 @@ package bob.geunrobeol.platform.tech.vo;
 
 import java.util.List;
 
+/**
+ * Scanner로부터 수집된 데이터 class. {@link BeaconData}를 갖고 있으며,
+ * {@link bob.geunrobeol.platform.tech.location.ILocationPreprocessor}를 통해
+ * {@link BeaconRecord}로 변환된다.
+ * @see BeaconData
+ */
 public class ScannerRecord {
     private long timestamp;
     private String scannerId;

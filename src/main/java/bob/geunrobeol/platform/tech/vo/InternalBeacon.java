@@ -5,6 +5,11 @@ import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+/**
+ * {@link bob.geunrobeol.platform.tech.location.LocationPrivacyHandler} 내부에서 활용되는 class.
+ * Concurrency를 위해 {@link ReadWriteLock}을 활용하며
+ * {@link BeaconRecord}에 대한 Wrapper class이다.
+ */
 public class InternalBeacon {
     private final String beaconId;
     private final ReadWriteLock rwLock;

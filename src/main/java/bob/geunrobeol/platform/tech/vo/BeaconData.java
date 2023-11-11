@@ -2,6 +2,10 @@ package bob.geunrobeol.platform.tech.vo;
 
 import java.util.Map;
 
+/**
+ * {@link ScannerData}의 Beacon class.
+ * @see ScannerData
+ */
 public class BeaconData {
     private String beaconId;
     private Map<String, Integer> payloads;

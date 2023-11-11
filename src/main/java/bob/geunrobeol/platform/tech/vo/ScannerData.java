@@ -1,5 +1,9 @@
 package bob.geunrobeol.platform.tech.vo;
 
+/**
+ * {@link BeaconRecord}의 Scanner class.
+ * @see BeaconRecord
+ */
 public class ScannerData {
     private long timestamp;
     private String scannerId;

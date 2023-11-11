@@ -16,16 +16,26 @@ import software.amazon.kinesis.common.KinesisClientUtil;
 import software.amazon.kinesis.coordinator.Scheduler;
 import software.amazon.kinesis.retrieval.polling.PollingConfig;
 
+/**
+ * 위치정보 관련 Configuration.
+ * @see LocationPrivacyConfig
+ */
 @Configuration
 public class LocationConfig {
     // TODO inject from external file(s).
     private final String AWS_REGION_NAME = "us-east-1";
     private final String AWS_KINESIS_STREAM_NAME = "scan_ble";
 
+    // WebSocket 관련 Constants
     public static final String WS_SCANNER_TOPIC = "/loc/sc";
     public static final String WS_POSITION_TOPIC = "/loc/pos";
     public static final long WS_POSITION_DELAYS = 2000L;
 
+    /**
+     * Spring에서 Async 작업을 위한 Thread Pool을 관리하는 Bean.
+     * 비동기로 실행할 작업이 있다면 해당 Bean을 통해 execute 하면 된다.
+     * @return ThreadPoolTaskExecutor
+     */
     @Bean
     public ThreadPoolTaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
@@ -38,6 +48,13 @@ public class LocationConfig {
         return executor;
     }
 
+    /**
+     * AWS Kinesis Data Stream의 Processor를 관리하는 Bean.
+     * 해당 Scheduler가 Data를 처리할 Worker 들을 자동으로 관리한다.
+     * @see software.amazon.kinesis.processor.ShardRecordProcessorFactory
+     * @param signalProcessorFactory Data를 처리할 Worker들을 생성하는 역할
+     * @return Scheduler
+     */
     @Bean(destroyMethod = "startGracefulShutdown")
     public Scheduler clientScheduler(SignalProcessorFactory signalProcessorFactory) {
         Region region = Region.of(AWS_REGION_NAME);

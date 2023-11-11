@@ -17,6 +17,9 @@ import bob.geunrobeol.platform.tech.vo.BeaconRecord;
 import bob.geunrobeol.platform.tech.vo.PositionRecord;
 import bob.geunrobeol.platform.tech.vo.ScannerRecord;
 
+/**
+ * 위치정보 관련 WebSocket Publisher. Scanner 수신 데이터나 위치정보 측위 관련 데이터들을 송신한다.
+ */
 @Service
 public class LocationPublisher {
     private static final Logger log = LoggerFactory.getLogger(LocationPublisher.class);
@@ -32,6 +35,10 @@ public class LocationPublisher {
     @Autowired
     private ILocationEstimator locationEstimator;
 
+    /**
+     * Scanner 데이터를 송신한다.
+     * @param record Scanner 데이터
+     */
     public void publishScanner(ScannerRecord record) {
         String msg = "{}";
         try {
@@ -43,6 +50,10 @@ public class LocationPublisher {
         messagingTemplate.convertAndSend(LocationConfig.WS_SCANNER_TOPIC, msg);
     }
 
+    /**
+     * 위치정보 측위정보를 주기적으로 송신한다.
+     * @see LocationConfig#WS_POSITION_DELAYS
+     */
     @Scheduled(fixedDelay = LocationConfig.WS_POSITION_DELAYS)
     public void publishPositions() {
         List<BeaconRecord> records = locationPreprocessor.popBeaconRecord();

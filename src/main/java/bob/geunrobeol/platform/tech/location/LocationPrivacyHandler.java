@@ -17,15 +17,26 @@ import bob.geunrobeol.platform.tech.vo.InternalBeacon;
 import bob.geunrobeol.platform.tech.vo.ScannerData;
 import bob.geunrobeol.platform.tech.vo.ScannerRecord;
 
+/**
+ * 위치정보 전처리 및 개인정보 보호 Handler. 전처리를 수행함과 동시에 개인정보 보호 기능까지 탑재되어 있다.
+ */
 @Service
 public class LocationPrivacyHandler implements ILocationPreprocessor {
     private static final Logger log = LoggerFactory.getLogger(LocationPrivacyHandler.class);
 
+    /**
+     * BeaconId를 Key로 가지는 HashMap
+     */
     HashMap<String, InternalBeacon> bconMap = new HashMap<>();
 
     @Autowired
     private LocationPrivacyPublisher publisher;
 
+    /**
+     * Scanner로부터 수신된 데이터를 입력한다. 입력 과정에서 데이터 전처리와 동시에
+     * 위치정보 보호 관련 기능들(가명처리나 위치정보 처리)을 수행한다.
+     * @param scannerRecord Scanner로 부터 수신된 데이터
+     */
     @Override
     public void pushScanRecord(ScannerRecord scannerRecord) {
         log.info("push {}", scannerRecord);
@@ -43,6 +54,7 @@ public class LocationPrivacyHandler implements ILocationPreprocessor {
             // Lock beacon first
             ib.getRwLock().writeLock().lock();
             try {
+                // Create a record as Scanner Data for Beacon Record
                 ScannerData s = new ScannerData(scannerRecord.getTimestamp(), scannerRecord.getScannerId(), b.getRssi());
 
                 // add scanners and payloads
@@ -57,20 +69,29 @@ public class LocationPrivacyHandler implements ILocationPreprocessor {
         }
     }
 
+    /**
+     * Beacon별 데이터를 조회한다.
+     * @return Beacon별 데이터
+     */
     @Override
     public List<BeaconRecord> popBeaconRecord() {
         List<BeaconRecord> records = new ArrayList<>();
         for (InternalBeacon ib : bconMap.values()) {
+            // Read lock first
             ib.getRwLock().readLock().lock();
             try {
-                   records.add(ib.getBeaconRecord());
+                records.add(ib.getBeaconRecord());
             } finally {
+                // Relase lock finally
                 ib.getRwLock().readLock().unlock();
             }
         }
         return records;
     }
 
+    /**
+     * 주기적으로 Scanner Data를 삭제한다. 특정 Threshold 수 이상인 경우 Base 수 만큼만 남기고 삭제한다.
+     */
     @Scheduled(fixedDelay = LocationPrivacyConfig.FLUSH_DELAY)
     private void flushRecords() {
         int cnt = 0;

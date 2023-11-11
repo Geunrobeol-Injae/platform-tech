@@ -5,6 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Beacon별 데이터 class. {@link ScannerRecord}를 갖고 있으며,
+ * {@link bob.geunrobeol.platform.tech.location.ILocationPreprocessor}를 통해
+ * {@link BeaconRecord}로부터 변환되었다.
+ * @see ScannerRecord
+ */
 public class BeaconRecord {
     private String pseudonym;
     private Map<Long, Map<String, Integer>> scannerPayloads;

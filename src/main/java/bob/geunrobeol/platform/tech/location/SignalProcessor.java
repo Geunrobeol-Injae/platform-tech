@@ -20,6 +20,11 @@ import software.amazon.kinesis.lifecycle.events.ShutdownRequestedInput;
 import software.amazon.kinesis.processor.ShardRecordProcessor;
 import software.amazon.kinesis.retrieval.KinesisClientRecord;
 
+/**
+ * AWS Kinesis에서 들어오는 데이터를 처리하는 class.
+ * 대부분의 method는 기본 예제에서 가져왔다.
+ * @see SignalProcessorFactory
+ */
 @Component
 @Scope("prototype")
 public class SignalProcessor implements ShardRecordProcessor {
@@ -47,6 +52,11 @@ public class SignalProcessor implements ShardRecordProcessor {
         }
     }
 
+    /**
+     * AWS Kinesis로부터 들어온 데이터를 처리한다.
+     * @param processRecordsInput Provides the records to be processed as well as information and capabilities related
+     *        to them (eg checkpointing).
+     */
     @Override
     public void processRecords(ProcessRecordsInput processRecordsInput) {
         MDC.put(SHARD_ID_MDC_KEY, shardId);
@@ -54,9 +64,14 @@ public class SignalProcessor implements ShardRecordProcessor {
             log.info("Processing {} record(s)", processRecordsInput.records().size());
 
             for (KinesisClientRecord r : processRecordsInput.records()) {
+                // Read bytes
                 byte[] bytes = new byte[r.data().remaining()];
                 r.data().get(bytes);
+
+                // Convert into Class
                 ScannerRecord record = objectMapper.readValue(bytes, ScannerRecord.class);
+
+                // Publish and push into preprocessor
                 locationPublisher.publishScanner(record);
                 locationPreprocessor.pushScanRecord(record);
             }
