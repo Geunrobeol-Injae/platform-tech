@@ -61,7 +61,9 @@ public class LocationPrivacyHandler implements ILocationPreprocessor {
                 ib.getScanners().add(0, s);
                 ib.putScannerPayloads(scannerRecord.getTimestamp(), b.getPayloads());
 
-                // TODO apply change psudonym and location
+                // TODO apply transition of psudonym and location
+
+
             } finally {
                 // Unlock beacon
                 ib.getRwLock().writeLock().unlock();

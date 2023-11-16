@@ -1,7 +1,9 @@
 package bob.geunrobeol.platform.tech.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.UUID;
@@ -20,11 +22,15 @@ import software.amazon.kinesis.retrieval.polling.PollingConfig;
  * 위치정보 관련 Configuration.
  * @see LocationPrivacyConfig
  */
+@PropertySource("classpath:location.properties")
 @Configuration
 public class LocationConfig {
     // TODO inject from external file(s).
-    private final String AWS_REGION_NAME = "us-east-1";
-    private final String AWS_KINESIS_STREAM_NAME = "scan_ble";
+    @Value("${kds.regionName}")
+    private String AWS_REGION_NAME = "";
+
+    @Value("${kds.streamName}")
+    private String AWS_KINESIS_STREAM_NAME = "";
 
     // WebSocket 관련 Constants
     public static final String WS_SCANNER_TOPIC = "/loc/sc";
