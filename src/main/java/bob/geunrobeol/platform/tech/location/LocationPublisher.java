@@ -59,6 +59,8 @@ public class LocationPublisher {
         List<BeaconRecord> records = locationPreprocessor.popBeaconRecord();
         List<PositionRecord> positions = locationEstimator.getPositions(records);
 
+        // TODO save positions
+
         String msg = "[]";
         try {
             msg = objectMapper.writeValueAsString(positions);

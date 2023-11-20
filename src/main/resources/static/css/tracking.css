@@ -1,0 +1,73 @@
+#fixed-dot-container {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 500px;
+    height: 225px;
+    z-index: 1;
+    overflow: hidden;
+    background: url(/platform-tech/static/img/map27.jpg);
+    background-position: calc(50% + 150px) calc(50% + 210px);
+    background-size: 237%;
+}
+#canvas {
+    position: relative;
+    width: 500px;
+    height: 225px;
+    border: 1px solid #ccc;
+    overflow: hidden;
+    z-index: 2;
+}
+.fixed-dot {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    background-color: rgba(0, 128, 0, 0.2); /* Adjust the alpha value (0.5 for semi-transparent) */
+    border-radius: 50%;
+    margin-left: -10px;
+    margin-top: -10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: green;
+    font-weight: bold;
+}
+.dot {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: red;
+    border-radius: 50%;
+    margin-left: -5px;
+    margin-top: -5px;
+}
+.latest-dot {
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    background-color: #EDB20D;
+    border-radius: 50%;
+    margin-left: -7.5px;
+    margin-top: -7.5px;
+}
+.line {
+    position: absolute;
+    background-color: red;
+    transform-origin: 0 100%;
+}
+.bar {
+    width: 2px;
+    background-color: black;
+}
+#table-container {
+    margin-top: 20px;
+}
+table {
+    border-collapse: collapse;
+    width: 500px;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}

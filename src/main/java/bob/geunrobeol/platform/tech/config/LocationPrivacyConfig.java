@@ -14,11 +14,11 @@ public class LocationPrivacyConfig {
     public final static int SCANNER_THRESHOLD = 30;
     public final static int SCANNER_BASE = 10;
 
-    // TODO Pseudonymization Configurations
+    // Pseudonymization Configurations
     private static final int PSUDONYM_RSSI = -60;
     private static final int PSUDONYM_MAX_SCANNERS = 3;
 
-    // TODO Dummization Configurations
+    // Dummization Configurations
     private static final Map<String, Integer> DUMMY_SCANNER_RSSI;
 
     static {

@@ -20,6 +20,8 @@ dependencies {
 	implementation("org.springframework:spring-websocket")
 	implementation("org.springframework:spring-messaging")
 	implementation("software.amazon.kinesis:amazon-kinesis-client:2.5.1")
+
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
 tasks.withType<Test> {
