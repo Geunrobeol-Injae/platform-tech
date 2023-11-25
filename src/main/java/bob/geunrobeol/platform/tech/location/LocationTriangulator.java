@@ -75,12 +75,9 @@ public class LocationTriangulator implements ILocationEstimator {
             ScannerData scanner = closestScanners.get(i);
             points[i] = scannerPositions.get(scanner.getScannerId());
             distances[i] = calculateDistanceFromRssi(scanner.getRssi());
-
-            System.out.println("Scanner ID: " + scanner.getScannerId() + ", Distance: " + distances[i]);
         }
 
         Point2D.Double position = triangulate(points[0], distances[0], points[1], distances[1], points[2], distances[2]);
-        System.out.println("Estimated Position: x=" + position.x + ", y=" + position.y);
 
         return new AbstractMap.SimpleEntry<>((long) position.x, (long) position.y);
 
