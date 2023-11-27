@@ -12,10 +12,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import bob.geunrobeol.platform.tech.config.LocationConfig;
+import bob.geunrobeol.platform.tech.config.WebSocketConfig;
 import bob.geunrobeol.platform.tech.vo.BeaconRecord;
-import bob.geunrobeol.platform.tech.vo.PositionRecord;
-import bob.geunrobeol.platform.tech.vo.ScannerRecord;
+import bob.geunrobeol.platform.tech.vo.BeaconPosition;
+import bob.geunrobeol.platform.tech.vo.raw.ScannerRecord;
 
 /**
  * 위치정보 관련 WebSocket Publisher. Scanner 수신 데이터나 위치정보 측위 관련 데이터들을 송신한다.
@@ -47,17 +47,17 @@ public class LocationPublisher {
             log.error("json.writeValue.error", e);
         }
 
-        messagingTemplate.convertAndSend(LocationConfig.WS_SCANNER_TOPIC, msg);
+        messagingTemplate.convertAndSend(WebSocketConfig.WS_SCANNER_TOPIC, msg);
     }
 
     /**
      * 위치정보 측위정보를 주기적으로 송신한다.
-     * @see LocationConfig#WS_POSITION_DELAYS
+     * @see WebSocketConfig#WS_POSITION_DELAYS
      */
-    @Scheduled(fixedDelay = LocationConfig.WS_POSITION_DELAYS)
+    @Scheduled(fixedDelay = WebSocketConfig.WS_POSITION_DELAYS)
     public void publishPositions() {
         List<BeaconRecord> records = locationPreprocessor.popBeaconRecord();
-        List<PositionRecord> positions = locationEstimator.getPositions(records);
+        List<BeaconPosition> positions = locationEstimator.getPositions(records);
 
         // TODO save positions
 
@@ -68,6 +68,6 @@ public class LocationPublisher {
             log.error("json.writeValue.error", e);
         }
 
-        messagingTemplate.convertAndSend(LocationConfig.WS_POSITION_TOPIC, msg);
+        messagingTemplate.convertAndSend(WebSocketConfig.WS_POSITION_TOPIC, msg);
     }
 }

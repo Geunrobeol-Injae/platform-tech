@@ -1,9 +1,12 @@
 package bob.geunrobeol.platform.tech.vo;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import bob.geunrobeol.platform.tech.vo.raw.ScannerRecord;
 
 /**
  * Beacon별 데이터 class. {@link ScannerRecord}를 갖고 있으며,
@@ -13,17 +16,13 @@ import java.util.Map;
  */
 public class BeaconRecord {
     private String pseudonym;
-    private Map<Long, Map<String, Integer>> scannerPayloads;
-    private List<ScannerData> scanners;
+    private Map<String, ScannerData> scanners;
+    private List<Map<String, Integer>> payloadsList;
 
     public BeaconRecord() {
-        this("", new HashMap<>(), new ArrayList<>());
-    }
-
-    public BeaconRecord(String pseudonym, Map<Long, Map<String, Integer>> scannerPayloads, List<ScannerData> scanners) {
-        this.pseudonym = pseudonym;
-        this.scannerPayloads = scannerPayloads;
-        this.scanners = scanners;
+        this.pseudonym = "";
+        this.scanners = new HashMap<>();
+        this.payloadsList = new ArrayList<>();
     }
 
     public String getPseudonym() {
@@ -34,29 +33,58 @@ public class BeaconRecord {
         this.pseudonym = pseudonym;
     }
 
-    public Map<Long, Map<String, Integer>> getScannerPayloads() {
-        return scannerPayloads;
-    }
-
-    public void putScannerPayloads(long timestamp, Map<String, Integer> payloads) {
-        scannerPayloads.put(timestamp, payloads);
-    }
-
     public List<ScannerData> getScanners() {
-        return scanners;
+        return new ArrayList<>(scanners.values());
     }
 
-    public void setScanners(List<ScannerData> scanners) {
-        this.scanners = scanners;
+    public void putScanner(String scannerId, long timestamp, int rssi) {
+        ScannerData scannerData;
+        if (!scanners.containsKey(scannerId)) {
+            // Create new ScannerData
+            scannerData = new ScannerData(scannerId, timestamp, rssi);
+            scanners.put(scannerId, scannerData);
+        } else {
+            // Update existing one
+            scannerData = scanners.get(scannerId);
+            scannerData.updateRssi(timestamp, rssi);
+        }
+    }
+
+    public long getTimestamp() {
+        return scanners.values().stream()
+                .map(ScannerData::getTimestamp)
+                .max(Comparator.naturalOrder())
+                .orElse(-1L);
+    }
+
+    /**
+     * Scanner들이 수신한 Payload를 단일 Payload로 정리한다.
+     * 현재는 Battery와 Click여부만을 수집하므로 각 Key별 최댓값을 반환한다.
+     * @return 단일 Payload
+     */
+    public Map<String, Integer> getPayloads() {
+        Map<String, Integer> payloads = new HashMap<>();
+        payloadsList.stream()
+                .limit(12)
+                .flatMap(p -> p.entrySet().stream())
+                .forEach(e -> payloads.compute(e.getKey(),
+                        (k, v) -> v == null ? e.getValue() : Math.max(v, e.getValue())));
+        return payloads;
+    }
+
+    public void putPayload(Map<String, Integer> payloads) {
+        this.payloadsList.add(0, payloads);
+        if (this.payloadsList.size() > 8) {
+            this.payloadsList.remove(8);
+        }
     }
 
     @Override
     public String toString() {
         return "BeaconRecord{" +
                 "pseudonym='" + pseudonym + '\'' +
-                ", scannerPayloads=" + scannerPayloads +
                 ", scanners=" + scanners +
+                ", payloads=" + payloadsList +
                 '}';
     }
 }
-

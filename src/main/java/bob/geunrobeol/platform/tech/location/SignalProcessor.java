@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import bob.geunrobeol.platform.tech.vo.ScannerRecord;
+import bob.geunrobeol.platform.tech.vo.raw.ScannerRecord;
 import software.amazon.kinesis.exceptions.InvalidStateException;
 import software.amazon.kinesis.exceptions.ShutdownException;
 import software.amazon.kinesis.lifecycle.events.InitializationInput;

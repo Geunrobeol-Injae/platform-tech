@@ -13,6 +13,10 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocket
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+    // WebSocket 관련 Constants
+    public static final String WS_SCANNER_TOPIC = "/loc/sc";
+    public static final String WS_POSITION_TOPIC = "/loc/pos";
+    public static final long WS_POSITION_DELAYS = 2000L;
     private static final String ORIGIN_PATTERNS = "*";
 
     /**
@@ -31,8 +35,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         config.enableSimpleBroker(
-                LocationConfig.WS_SCANNER_TOPIC,
+                WS_SCANNER_TOPIC,
                 LocationPrivacyConfig.WS_PSUDONYM_TOPIC,
-                LocationConfig.WS_POSITION_TOPIC);
+                WS_POSITION_TOPIC);
     }
 }

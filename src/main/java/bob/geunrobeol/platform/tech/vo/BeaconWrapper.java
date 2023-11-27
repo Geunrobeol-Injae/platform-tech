@@ -5,17 +5,20 @@ import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import bob.geunrobeol.platform.tech.vo.raw.BeaconData;
+import bob.geunrobeol.platform.tech.vo.raw.ScannerRecord;
+
 /**
  * {@link bob.geunrobeol.platform.tech.location.LocationPrivacyHandler} 내부에서 활용되는 class.
  * Concurrency를 위해 {@link ReadWriteLock}을 활용하며
  * {@link BeaconRecord}에 대한 Wrapper class이다.
  */
-public class InternalBeacon {
+public class BeaconWrapper {
     private final String beaconId;
     private final ReadWriteLock rwLock;
     private final BeaconRecord beaconRecord;
 
-    public InternalBeacon(String beaconId) {
+    public BeaconWrapper(String beaconId) {
         this.beaconId = beaconId;
         this.rwLock = new ReentrantReadWriteLock();
         this.beaconRecord = new BeaconRecord();
@@ -41,20 +44,9 @@ public class InternalBeacon {
         this.beaconRecord.setPseudonym(pseudonym);
     }
 
-    public Map<Long, Map<String, Integer>> getScannerPayloads() {
-        return beaconRecord.getScannerPayloads();
-    }
-
-    public void putScannerPayloads(long timestamp, Map<String, Integer> payloads) {
-        beaconRecord.putScannerPayloads(timestamp, payloads);
-    }
-
-    public List<ScannerData> getScanners() {
-        return beaconRecord.getScanners();
-    }
-
-    public void setScanners(List<ScannerData> scanners) {
-        beaconRecord.setScanners(scanners);
+    public void putScanner(ScannerRecord scanner, BeaconData beacon) {
+        beaconRecord.putScanner(scanner.scannerId(), scanner.timestamp(), beacon.rssi());
+        beaconRecord.putPayload(beacon.payloads());
     }
 
     @Override

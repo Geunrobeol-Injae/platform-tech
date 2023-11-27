@@ -1,10 +1,7 @@
 package bob.geunrobeol.platform.tech.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.UUID;
 
@@ -22,37 +19,14 @@ import software.amazon.kinesis.retrieval.polling.PollingConfig;
  * 위치정보 관련 Configuration.
  * @see LocationPrivacyConfig
  */
-@PropertySource("classpath:location.properties")
 @Configuration
 public class LocationConfig {
-    // TODO inject from external file(s).
-    @Value("${kds.regionName}")
-    private String AWS_REGION_NAME = "";
+    private final String AWS_REGION_NAME = "us-east-1";
+    private final String AWS_KINESIS_STREAM_NAME = "scan_ble";
 
-    @Value("${kds.streamName}")
-    private String AWS_KINESIS_STREAM_NAME = "";
-
-    // WebSocket 관련 Constants
-    public static final String WS_SCANNER_TOPIC = "/loc/sc";
-    public static final String WS_POSITION_TOPIC = "/loc/pos";
-    public static final long WS_POSITION_DELAYS = 2000L;
-
-    /**
-     * Spring에서 Async 작업을 위한 Thread Pool을 관리하는 Bean.
-     * 비동기로 실행할 작업이 있다면 해당 Bean을 통해 execute 하면 된다.
-     * @return ThreadPoolTaskExecutor
-     */
-    @Bean
-    public ThreadPoolTaskExecutor taskExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(5);
-        executor.setMaxPoolSize(5);
-        executor.setQueueCapacity(10);
-        executor.setThreadNamePrefix("Task-");
-
-        executor.initialize();
-        return executor;
-    }
+    // Kalman Filter 관련 Constants
+    public static final double KALMAN_PROCESS_NOISE = 1.0;
+    public static final double KALMAN_MEASUREMENT_NOISE = 20.0;
 
     /**
      * AWS Kinesis Data Stream의 Processor를 관리하는 Bean.

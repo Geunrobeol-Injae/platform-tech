@@ -1,42 +1,37 @@
 package bob.geunrobeol.platform.tech.vo;
 
+import bob.geunrobeol.platform.tech.location.KalmanFilter;
+
 /**
  * {@link BeaconRecord}의 Scanner class.
  * @see BeaconRecord
  */
 public class ScannerData {
+    private final String scannerId;
     private long timestamp;
-    private String scannerId;
-    private int rssi;
+    private KalmanFilter kalmanFilter;
 
-    public ScannerData(long timestamp, String scannerId, int rssi) {
-        this.timestamp = timestamp;
+    public ScannerData(String scannerId, long timestamp, int rssi) {
         this.scannerId = scannerId;
-        this.rssi = rssi;
+        this.timestamp = timestamp;
+        this.kalmanFilter = new KalmanFilter(rssi);
     }
 
     public long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
-    }
-
     public String getScannerId() {
         return scannerId;
     }
 
-    public void setScannerId(String scannerId) {
-        this.scannerId = scannerId;
+    public double getRssi() {
+        return kalmanFilter.getEstimatedValue();
     }
 
-    public int getRssi() {
-        return rssi;
-    }
-
-    public void setRssi(int rssi) {
-        this.rssi = rssi;
+    public void updateRssi(long timestamp, int rssi) {
+        this.timestamp = timestamp;
+        this.kalmanFilter.update(rssi);
     }
 
     @Override
@@ -44,7 +39,7 @@ public class ScannerData {
         return "ScannerData{" +
                 "timestamp=" + timestamp +
                 ", scannerId='" + scannerId + '\'' +
-                ", rssi=" + rssi +
+                ", rssi=" + kalmanFilter.getEstimatedValue() +
                 '}';
     }
 }

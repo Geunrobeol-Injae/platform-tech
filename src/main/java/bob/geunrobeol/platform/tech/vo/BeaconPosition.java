@@ -1,5 +1,6 @@
 package bob.geunrobeol.platform.tech.vo;
 
+import java.awt.geom.Point2D;
 import java.util.Map;
 
 /**
@@ -8,18 +9,17 @@ import java.util.Map;
  * @param timestamp
  * @param pseudonym
  * @param payloads
- * @param x
- * @param y
+ * @param pos
  */
-public record PositionRecord(long timestamp, String pseudonym, Map<String, Integer> payloads, long x, long y) {
+public record BeaconPosition(String pseudonym, long timestamp, Map<String, Integer> payloads, Point2D.Double pos) {
     @Override
     public String toString() {
         return "PositionRecord{" +
                 "timestamp=" + timestamp +
                 ", pseudonym='" + pseudonym + '\'' +
                 ", payloads=" + payloads +
-                ", x=" + x +
-                ", y=" + y +
+                ", x=" + pos.x +
+                ", y=" + pos.y +
                 '}';
     }
 }
