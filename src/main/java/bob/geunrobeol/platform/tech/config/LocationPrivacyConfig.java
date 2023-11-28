@@ -14,10 +14,12 @@ public class LocationPrivacyConfig {
 
     // Dummization Configurations
     public static final Map<String, Integer> DUMMY_SCANNER_RSSI;
+    public static final String DUMMY_SCANNER_ID = "D"; 
+    public static final int DUMMY_RSSI_THRESHOLD = -40;      
 
     static {
         DUMMY_SCANNER_RSSI = new HashMap<>();
-        DUMMY_SCANNER_RSSI.put("SCAN-D", -40);
+        DUMMY_SCANNER_RSSI.put(DUMMY_SCANNER_ID, DUMMY_RSSI_THRESHOLD);  
     }
 
     public static final int PAYLOAD_FLUSH_MAX = 16;

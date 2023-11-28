@@ -52,15 +52,14 @@ public class BeaconWrapper {
         List<ScannerData> scanners = new ArrayList<>(scannerMap.values());
 
 
-        // Check if D scanner's RSSI is -40 or higher
+        // Dummy the location 
         boolean shouldDummy = scanners.stream()
-            .filter(scannerData -> scannerData.getScannerId().equals("D"))
-            .anyMatch(scannerData -> scannerData.getRssi() >= -40);
+            .filter(scannerData -> scannerData.getScannerId().equals(LocationPrivacyConfig.DUMMY_SCANNER_ID))
+            .anyMatch(scannerData -> scannerData.getRssi() >= LocationPrivacyConfig.DUMMY_RSSI_THRESHOLD);
 
-        // Dummy the location if the condition is met
         if (shouldDummy) {
             scanners.forEach(scannerData -> {
-                if (!scannerData.getScannerId().equals("D")) {
+                if (!scannerData.getScannerId().equals(LocationPrivacyConfig.DUMMY_SCANNER_ID)) {
                     scannerData.updateRssiDirectly(-100);
                 } else {
                     scannerData.updateRssiDirectly(0);
