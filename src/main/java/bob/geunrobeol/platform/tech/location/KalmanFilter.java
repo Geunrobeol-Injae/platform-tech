@@ -26,7 +26,7 @@ public class KalmanFilter {
         estimationError = (1 - kalmanGain) * predictionError;
     }
 
-    public double getEstimatedValue() {
+    public double get() {
         return estimatedValue;
     }
 }

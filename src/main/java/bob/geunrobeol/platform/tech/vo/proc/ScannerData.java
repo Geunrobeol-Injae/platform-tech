@@ -1,4 +1,4 @@
-package bob.geunrobeol.platform.tech.vo;
+package bob.geunrobeol.platform.tech.vo.proc;
 
 import bob.geunrobeol.platform.tech.location.KalmanFilter;
 
@@ -9,7 +9,7 @@ import bob.geunrobeol.platform.tech.location.KalmanFilter;
 public class ScannerData {
     private final String scannerId;
     private long timestamp;
-    private KalmanFilter kalmanFilter;
+    private final KalmanFilter kalmanFilter;
 
     public ScannerData(String scannerId, long timestamp, int rssi) {
         this.scannerId = scannerId;
@@ -17,16 +17,16 @@ public class ScannerData {
         this.kalmanFilter = new KalmanFilter(rssi);
     }
 
-    public long getTimestamp() {
-        return timestamp;
-    }
-
     public String getScannerId() {
         return scannerId;
     }
 
+    public long getTimestamp() {
+        return timestamp;
+    }
+
     public double getRssi() {
-        return kalmanFilter.getEstimatedValue();
+        return kalmanFilter.get();
     }
 
     public void updateRssi(long timestamp, int rssi) {
@@ -37,9 +37,9 @@ public class ScannerData {
     @Override
     public String toString() {
         return "ScannerData{" +
-                "timestamp=" + timestamp +
-                ", scannerId='" + scannerId + '\'' +
-                ", rssi=" + kalmanFilter.getEstimatedValue() +
+                "scannerId='" + scannerId + '\'' +
+                ", timestamp=" + timestamp +
+                ", rssi=" + kalmanFilter.get() +
                 '}';
     }
 }

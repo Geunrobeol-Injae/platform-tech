@@ -9,16 +9,19 @@ import java.util.Map;
  */
 public class LocationPrivacyConfig {
     // Pseudonymization Configurations
-    private static final int PSUDONYM_RSSI = -60;
-    private static final int PSUDONYM_MAX_SCANNERS = 3;
+    public static final int PSEUDONYM_RSSI = -60;
+    public static final int PSEUDONYM_MAX_SCANNERS = 3;
 
     // Dummization Configurations
-    private static final Map<String, Integer> DUMMY_SCANNER_RSSI;
+    public static final Map<String, Integer> DUMMY_SCANNER_RSSI;
 
     static {
         DUMMY_SCANNER_RSSI = new HashMap<>();
         DUMMY_SCANNER_RSSI.put("SCAN-D", -40);
     }
 
-    public final static String WS_PSUDONYM_TOPIC = "/loc/ps";
+    public static final int PAYLOAD_FLUSH_MAX = 16;
+    public static final int PAYLOAD_FLUSH_REMAIN = 8;
+
+    public static final String WS_PSEUDONYM_TOPIC = "/loc/ps";
 }

@@ -13,7 +13,7 @@ class ApplicationTests {
 
 	@Test
 	public void contextLoads() {
-		assertEquals(1 + 1, 2);
+		assertEquals(1+1, 2, "one plus one should be two");
 		log.info("Hello World!");
 	}
 }

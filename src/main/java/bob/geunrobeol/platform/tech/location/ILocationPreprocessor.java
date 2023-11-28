@@ -2,7 +2,7 @@ package bob.geunrobeol.platform.tech.location;
 
 import java.util.List;
 
-import bob.geunrobeol.platform.tech.vo.BeaconRecord;
+import bob.geunrobeol.platform.tech.vo.proc.BeaconRecord;
 import bob.geunrobeol.platform.tech.vo.raw.ScannerRecord;
 
 /**

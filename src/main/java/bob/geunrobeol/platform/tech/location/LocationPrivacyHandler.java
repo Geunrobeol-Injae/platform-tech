@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import bob.geunrobeol.platform.tech.vo.raw.BeaconData;
-import bob.geunrobeol.platform.tech.vo.BeaconRecord;
 import bob.geunrobeol.platform.tech.vo.BeaconWrapper;
+import bob.geunrobeol.platform.tech.vo.proc.BeaconRecord;
+import bob.geunrobeol.platform.tech.vo.raw.BeaconData;
 import bob.geunrobeol.platform.tech.vo.raw.ScannerRecord;
 
 /**
@@ -28,6 +28,9 @@ public class LocationPrivacyHandler implements ILocationPreprocessor {
 
     @Autowired
     private LocationPrivacyPublisher publisher;
+
+    @Autowired
+    private PseudonymProvider pseudonymProvider;
 
     /**
      * Scanner로부터 수신된 데이터를 입력한다. 입력 과정에서 데이터 전처리와 동시에
@@ -54,6 +57,10 @@ public class LocationPrivacyHandler implements ILocationPreprocessor {
                 // Push Scanned Results
                 bw.putScanner(scanner, beacon);
 
+                if (bw.isPseudonymExpired()) {
+                    String newPseudonym = pseudonymProvider.refresh(bw.getPseudonym(), scanner.scannerId());
+                    bw.setPseudonym(newPseudonym);
+                }
 
             } finally {
                 // Unlock beacon

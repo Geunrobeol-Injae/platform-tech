@@ -2,7 +2,7 @@ package bob.geunrobeol.platform.tech.vo.raw;
 
 import java.util.Map;
 
-import bob.geunrobeol.platform.tech.vo.ScannerData;
+import bob.geunrobeol.platform.tech.vo.proc.ScannerData;
 
 /**
  * {@link ScannerData}의 Beacon class.

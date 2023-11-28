@@ -10,11 +10,12 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import bob.geunrobeol.platform.tech.config.WebSocketConfig;
-import bob.geunrobeol.platform.tech.vo.BeaconRecord;
 import bob.geunrobeol.platform.tech.vo.BeaconPosition;
+import bob.geunrobeol.platform.tech.vo.proc.BeaconRecord;
 import bob.geunrobeol.platform.tech.vo.raw.ScannerRecord;
 
 /**
@@ -57,7 +58,13 @@ public class LocationPublisher {
     @Scheduled(fixedDelay = WebSocketConfig.WS_POSITION_DELAYS)
     public void publishPositions() {
         List<BeaconRecord> records = locationPreprocessor.popBeaconRecord();
-        List<BeaconPosition> positions = locationEstimator.getPositions(records);
+        List<BeaconPosition> positions = new ArrayList<>();
+        for (BeaconRecord r : records) {
+            positions.add(new BeaconPosition(r.getPseudonym(),
+                    r.getTimestamp(),
+                    locationEstimator.getPosition(r.getScanners()),
+                    r.getPayloads()));
+        }
 
         // TODO save positions
 

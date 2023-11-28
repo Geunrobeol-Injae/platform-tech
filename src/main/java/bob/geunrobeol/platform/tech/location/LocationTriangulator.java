@@ -8,30 +8,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import bob.geunrobeol.platform.tech.config.ScannerConfig;
-import bob.geunrobeol.platform.tech.vo.BeaconPosition;
-import bob.geunrobeol.platform.tech.vo.BeaconRecord;
-import bob.geunrobeol.platform.tech.vo.ScannerData;
+import bob.geunrobeol.platform.tech.vo.proc.ScannerData;
 
 /**
  * 삼각측량법을 구현한 Class.
  */
 @Service
 public class LocationTriangulator implements ILocationEstimator {
-
-    /**
-     * Beacon별 스캐너 데이터(N개)로부터 Beacon의 위치(1개)를 추정한다.
-     * @param beacon Beacon별 스캐너 데이터
-     * @return 단일 위치 데이터
-     */
-    @Override
-    public BeaconPosition getPosition(BeaconRecord beacon) {
-        Point2D.Double pos = estimatePosition(beacon.getScanners());
-
-        return new BeaconPosition(beacon.getPseudonym(),beacon.getTimestamp(),
-                beacon.getPayloads(), pos);
-    }
-    
-
     /**
      * BeaconRecord에서 제공된 스캐너 데이터를 사용하여 사용자의 위치를 추정한다.
      * 이 메소드는 RSSI 값을 기반으로 가장 강한 신호를 보낸 상위 3개의 스캐너를 선택하고,
@@ -39,7 +22,7 @@ public class LocationTriangulator implements ILocationEstimator {
      * @param scanners BeaconRecord에 포함된 스캐너 데이터 목록
      * @return 추정된 사용자의 위치 좌표 (x, y). Map.Entry 객체로, key는 x좌표, value는 y좌표를 나타낸다.
      */
-    private Point2D.Double estimatePosition(List<ScannerData> scanners) {
+    public Point2D.Double getPosition(List<ScannerData> scanners) {
         List<ScannerData> closestScanners = scanners.stream()
             .sorted(Comparator.comparingDouble(ScannerData::getRssi).reversed())
             .limit(3)

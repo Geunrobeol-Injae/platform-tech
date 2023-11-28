@@ -19,7 +19,7 @@ public class LocationPrivacyPublisher {
      * 전처리 또는 가명화 관련 Event들을 Publish한다.
      * @param msg 출력할 메시지
      */
-    public void publishPsudonym(String msg) {
-        messagingTemplate.convertAndSend(LocationPrivacyConfig.WS_PSUDONYM_TOPIC, msg);
+    public void publishPseudonym(String msg) {
+        messagingTemplate.convertAndSend(LocationPrivacyConfig.WS_PSEUDONYM_TOPIC, msg);
     }
 }

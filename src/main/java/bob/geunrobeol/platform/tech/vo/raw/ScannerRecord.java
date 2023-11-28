@@ -2,7 +2,7 @@ package bob.geunrobeol.platform.tech.vo.raw;
 
 import java.util.List;
 
-import bob.geunrobeol.platform.tech.vo.BeaconRecord;
+import bob.geunrobeol.platform.tech.vo.proc.BeaconRecord;
 
 /**
  * Scanner로부터 수집된 데이터 class. {@link BeaconData}를 갖고 있으며,
