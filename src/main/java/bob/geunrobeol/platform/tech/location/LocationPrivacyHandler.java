@@ -74,7 +74,7 @@ public class LocationPrivacyHandler implements ILocationPreprocessor {
      * @return Beacon별 데이터
      */
     @Override
-    public List<BeaconRecord> popBeaconRecord() {
+    public List<BeaconRecord> popBeaconRecord() { 
         List<BeaconRecord> records = new ArrayList<>();
         for (BeaconWrapper bw : beaconMap.values()) {
             // Read lock first

@@ -43,9 +43,31 @@ public class BeaconWrapper {
         return rwLock;
     }
 
+    
+
+
     public BeaconRecord getBeaconRecord() {
+        
         // Scanners
         List<ScannerData> scanners = new ArrayList<>(scannerMap.values());
+
+
+        // Check if D scanner's RSSI is -40 or higher
+        boolean shouldDummy = scanners.stream()
+            .filter(scannerData -> scannerData.getScannerId().equals("D"))
+            .anyMatch(scannerData -> scannerData.getRssi() >= -40);
+
+        // Dummy the location if the condition is met
+        if (shouldDummy) {
+            scanners.forEach(scannerData -> {
+                if (!scannerData.getScannerId().equals("D")) {
+                    scannerData.updateRssiDirectly(-100);
+                } else {
+                    scannerData.updateRssiDirectly(0);
+                }
+            });
+        }
+
 
         // Payloads
         Map<String, Integer> payloads = new HashMap<>();
@@ -54,9 +76,13 @@ public class BeaconWrapper {
                 .flatMap(p -> p.entrySet().stream())
                 .forEach(e -> payloads.compute(e.getKey(),
                         (k, v) -> v == null ? e.getValue() : Math.max(v, e.getValue())));
-
+    
         return new BeaconRecord(pseudonym, scanners, payloads);
     }
+    
+    
+
+
 
     public void putScanner(ScannerRecord s, BeaconData b) {
         // Update Payloads
@@ -74,13 +100,14 @@ public class BeaconWrapper {
             scanner.updateRssi(s.timestamp(), b.rssi());
             rssi = scanner.getRssi();
         }
+        
+
 
         // Count Pseudonymization
         if (rssi <= LocationPrivacyConfig.PSEUDONYM_RSSI) {
             psudonymScanners.add(s.scannerId());
         }
 
-        // TODO Dummization
 
         // PAYLOAD_FLUSH_MAX을 초과하는지 확인
         if (payloadsList.size() > LocationPrivacyConfig.PAYLOAD_FLUSH_MAX) {

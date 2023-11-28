@@ -34,6 +34,10 @@ public class ScannerData {
         this.kalmanFilter.update(rssi);
     }
 
+    public void updateRssiDirectly(int rssi) {
+        this.kalmanFilter.set(rssi); 
+    }
+
     @Override
     public String toString() {
         return "ScannerData{" +

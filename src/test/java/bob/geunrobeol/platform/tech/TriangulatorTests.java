@@ -27,10 +27,10 @@ public class TriangulatorTests {
         Point2D.Double pos;
 
         // 첫 번째 측위 대상자의 첫 번째 타임스탬프 데이터
-        scanners.add(new ScannerData("A", 1L, -65));
-        scanners.add(new ScannerData("B", 1L, -80));
-        scanners.add(new ScannerData("C", 1L, -25));
-        scanners.add(new ScannerData("D", 1L, -40));
+        scanners.add(new ScannerData("A", 1L, -100));
+        scanners.add(new ScannerData("B", 1L, -100));
+        scanners.add(new ScannerData("C", 1L, -100));
+        scanners.add(new ScannerData("D", 1L, -0));
 
         pos = locationTriangulator.getPosition(scanners);
         log.info("Beacon(1) pos(1): {}, {}", pos.x, pos.y);

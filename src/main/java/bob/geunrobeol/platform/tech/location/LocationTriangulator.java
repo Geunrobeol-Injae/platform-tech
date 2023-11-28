@@ -23,6 +23,17 @@ public class LocationTriangulator implements ILocationEstimator {
      * @return 추정된 사용자의 위치 좌표 (x, y). Map.Entry 객체로, key는 x좌표, value는 y좌표를 나타낸다.
      */
     public Point2D.Double getPosition(List<ScannerData> scanners) {
+        // D 스캐너에서의 RSSI 값이 0이고, 나머지 스캐너들에서는 -100인지 확인
+        boolean isDScannerZero = scanners.stream().anyMatch(s -> s.getScannerId().equals("D") && s.getRssi() == 0);
+        long nonDMinusHundredCount = scanners.stream().filter(s -> !s.getScannerId().equals("D") && s.getRssi() == -100).count();
+
+        if (isDScannerZero && nonDMinusHundredCount == scanners.size() - 1) {
+            // D 스캐너의 좌표 반환
+            return ScannerConfig.SCANNER_POSITIONS.get("D");
+        }
+
+        
+        // 삼각측량 로직
         List<ScannerData> closestScanners = scanners.stream()
             .sorted(Comparator.comparingDouble(ScannerData::getRssi).reversed())
             .limit(3)
@@ -40,6 +51,7 @@ public class LocationTriangulator implements ILocationEstimator {
     }
 
 
+    
     /**
      * RSSI 신호 강도를 거리로 변환한다.
      * @param rssi RSSI 신호 강도 값

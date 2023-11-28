@@ -29,4 +29,8 @@ public class KalmanFilter {
     public double get() {
         return estimatedValue;
     }
+    
+    public void set(double newValue) {
+        this.estimatedValue = newValue;
+    }
 }
