@@ -10,9 +10,9 @@ public class ScannerConfig {
 
     static {
         SCANNER_POSITIONS = new HashMap<>();
-        SCANNER_POSITIONS.put("A", new Point2D.Double(0, 0));
-        SCANNER_POSITIONS.put("B", new Point2D.Double(400, 0));
-        SCANNER_POSITIONS.put("C", new Point2D.Double(0, 400));
-        SCANNER_POSITIONS.put("D", new Point2D.Double(400, 400));
+        SCANNER_POSITIONS.put("SCAN-A", new Point2D.Double(0, 0));
+        SCANNER_POSITIONS.put("SCAN-B", new Point2D.Double(400, 0));
+        SCANNER_POSITIONS.put("SCAN-C", new Point2D.Double(0, 400));
+        SCANNER_POSITIONS.put("SCAN-D", new Point2D.Double(400, 400));
     }
 }

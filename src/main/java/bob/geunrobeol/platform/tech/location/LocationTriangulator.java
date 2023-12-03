@@ -3,6 +3,7 @@ package bob.geunrobeol.platform.tech.location;
 import org.springframework.stereotype.Service;
 
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,6 +11,8 @@ import java.util.stream.Collectors;
 import bob.geunrobeol.platform.tech.config.LocationPrivacyConfig;
 import bob.geunrobeol.platform.tech.config.ScannerConfig;
 import bob.geunrobeol.platform.tech.vo.proc.ScannerData;
+import java.util.Random;
+
 
 /**
  * 삼각측량법을 구현한 Class.
@@ -24,20 +27,51 @@ public class LocationTriangulator implements ILocationEstimator {
      * @return 추정된 사용자의 위치 좌표 (x, y). Map.Entry 객체로, key는 x좌표, value는 y좌표를 나타낸다.
      */
     public Point2D.Double getPosition(List<ScannerData> scanners) {
+        // 위치 더미화
         boolean isSpecificScannerZero = scanners.stream().anyMatch(s -> s.getScannerId().equals(LocationPrivacyConfig.DUMMY_SCANNER_ID) && s.getRssi() == 0);
         long nonSpecificMinusHundredCount = scanners.stream().filter(s -> !s.getScannerId().equals(LocationPrivacyConfig.DUMMY_SCANNER_ID) && s.getRssi() == -100).count();
-
+    
         if (isSpecificScannerZero && nonSpecificMinusHundredCount == scanners.size() - 1) {
             return ScannerConfig.SCANNER_POSITIONS.get(LocationPrivacyConfig.DUMMY_SCANNER_ID);
-}
-
+        }   
+    
+        // 스캐너가 없을 경우 (0, 0) 반환
+        if (scanners.isEmpty()) {
+            return new Point2D.Double(1, 1);
+        }
+    
+        // 스캐너가 하나만 있을 경우 해당 스캐너 위치 반환
+        if (scanners.size() == 1) {
+            ScannerData scanner = scanners.get(0);
+            return ScannerConfig.SCANNER_POSITIONS.get(scanner.getScannerId());
+        }
+    
+        // 스캐너가 두 개 있을 경우 교점 중 하나를 랜덤으로 선택
+        if (scanners.size() == 2) {
+            ScannerData scanner1 = scanners.get(0);
+            ScannerData scanner2 = scanners.get(1);
+    
+            Point2D.Double position1 = ScannerConfig.SCANNER_POSITIONS.get(scanner1.getScannerId());
+            Point2D.Double position2 = ScannerConfig.SCANNER_POSITIONS.get(scanner2.getScannerId());
+    
+            double distance1 = calculateDistanceFromRssi(scanner1.getRssi());
+            double distance2 = calculateDistanceFromRssi(scanner2.getRssi());
+    
+            List<Point2D.Double> intersections = calculateIntersections(position1, distance1, position2, distance2);
+    
+            Random rand = new Random();
+    
+            return (intersections.isEmpty()) 
+                ? (rand.nextBoolean() ? position1 : position2) 
+                : intersections.get(rand.nextInt(intersections.size()));
+        }
         
         // 삼각측량 로직
         List<ScannerData> closestScanners = scanners.stream()
             .sorted(Comparator.comparingDouble(ScannerData::getRssi).reversed())
             .limit(3)
             .collect(Collectors.toList());
-
+    
         Point2D.Double[] points = new Point2D.Double[3];
         double[] distances = new double[3];
         for (int i = 0; i < 3; i++) {
@@ -45,10 +79,17 @@ public class LocationTriangulator implements ILocationEstimator {
             points[i] = ScannerConfig.SCANNER_POSITIONS.get(scanner.getScannerId());
             distances[i] = calculateDistanceFromRssi(scanner.getRssi());
         }
-
-        return triangulate(points[0], distances[0], points[1], distances[1], points[2], distances[2]);
+    
+        Point2D.Double calculatedPosition = triangulate(points[0], distances[0], points[1], distances[1], points[2], distances[2]);
+    
+        // 오류 처리: 계산된 위치가 null이거나, x 또는 y 좌표가 NaN이거나 음수인 경우
+        if (calculatedPosition == null || Double.isNaN(calculatedPosition.x) || Double.isNaN(calculatedPosition.y) || calculatedPosition.x < 0 || calculatedPosition.y < 0) {
+            return new Point2D.Double(399, 399);
+        }
+    
+        return calculatedPosition;
     }
-
+    
 
     
     /**
@@ -92,4 +133,35 @@ public class LocationTriangulator implements ILocationEstimator {
     
         return new Point2D.Double(x, y);
     }
+
+
+    
+    /**
+     * 스캐너가 2개일 때, 두 원의 교점을 계산한다.
+     * @param center1 첫 번째 원의 중심
+     * @param radius1 첫 번째 원의 반지름
+     * @param center2 두 번째 원의 중심
+     * @param radius2 두 번째 원의 반지름
+     * @return 교점 목록
+     */
+     private List<Point2D.Double> calculateIntersections(Point2D.Double center1, double radius1, Point2D.Double center2, double radius2) {
+        List<Point2D.Double> intersections = new ArrayList<>();
+        double d = center1.distance(center2);
+        double a = (radius1 * radius1 - radius2 * radius2 + d * d) / (2 * d);
+        double h = Math.sqrt(radius1 * radius1 - a * a);
+        double x2 = center1.x + a * (center2.x - center1.x) / d;
+        double y2 = center1.y + a * (center2.y - center1.y) / d;
+    
+        if (h == 0) { // 하나의 교점
+            intersections.add(new Point2D.Double(x2, y2));
+        } else { // 두 개의 교점
+            double rx = -(center2.y - center1.y) * (h / d);
+            double ry = (center2.x - center1.x) * (h / d);
+    
+            intersections.add(new Point2D.Double(x2 + rx, y2 + ry));
+            intersections.add(new Point2D.Double(x2 - rx, y2 - ry));
+        }
+        return intersections;
+    }
+    
 }

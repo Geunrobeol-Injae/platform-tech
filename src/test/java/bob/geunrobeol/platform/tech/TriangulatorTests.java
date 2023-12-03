@@ -27,23 +27,13 @@ public class TriangulatorTests {
         Point2D.Double pos;
 
         // 첫 번째 측위 대상자의 첫 번째 타임스탬프 데이터
-        scanners.add(new ScannerData("A", 1L, -100));
-        scanners.add(new ScannerData("B", 1L, -100));
-        scanners.add(new ScannerData("C", 1L, -100));
-        scanners.add(new ScannerData("D", 1L, -0));
+        scanners.add(new ScannerData("SCAN-A", 1L, -100));
+        scanners.add(new ScannerData("SCAN-B", 1L, -100));
+        scanners.add(new ScannerData("SCAN-C", 1L, -100));
+        scanners.add(new ScannerData("SCAN-D", 1L, -0));
 
         pos = locationTriangulator.getPosition(scanners);
         log.info("Beacon(1) pos(1): {}, {}", pos.x, pos.y);
-
-        // 첫 번째 측위 대상자의 두 번째 타임스탬프 데이터
-        scanners.clear();
-        scanners.add(new ScannerData("A", 2L, -50));
-        scanners.add(new ScannerData("B", 2L, -70));
-        scanners.add(new ScannerData("C", 2L, -40));
-        scanners.add(new ScannerData("D", 2L, -55));
-
-        pos = locationTriangulator.getPosition(scanners);
-        log.info("Beacon(1) pos(2): {}, {}", pos.x, pos.y);
     }
 
     @Test
@@ -52,22 +42,62 @@ public class TriangulatorTests {
         Point2D.Double pos;
 
         // 두 번째 측위 대상자의 첫 번째 타임스탬프 데이터
-        scanners.add(new ScannerData("A", 1L, -25));
-        scanners.add(new ScannerData("B", 1L, -65));
-        scanners.add(new ScannerData("C", 1L, -40));
-        scanners.add(new ScannerData("D", 1L, -80));
+        scanners.add(new ScannerData("SCAN-A", 1L, -25));
+        scanners.add(new ScannerData("SCAN-B", 1L, -65));
+        scanners.add(new ScannerData("SCAN-C", 1L, -40));
+        scanners.add(new ScannerData("SCAN-D", 1L, -80));
 
         pos = locationTriangulator.getPosition(scanners);
         log.info("Beacon(2) pos(1): {}, {}", pos.x, pos.y);
+    }
 
-        // 두 번째 측위 대상자의 두 번째 타임스탬프 데이터
-        scanners.clear();
-        scanners.add(new ScannerData("A", 2L, -40));
-        scanners.add(new ScannerData("B", 2L, -25));
-        scanners.add(new ScannerData("C", 2L, -80));
-        scanners.add(new ScannerData("D", 2L, -65));
+    @Test
+    public void triangulate3() {
+        List<ScannerData> scanners = new ArrayList<>();
+        Point2D.Double pos;
+
+        // 세 번째 측위 대상자의 첫 번째 타임스탬프 데이터
 
         pos = locationTriangulator.getPosition(scanners);
-        log.info("Beacon(2) pos(2): {}, {}", pos.x, pos.y);
+        log.info("Beacon(3) pos(1): {}, {}", pos.x, pos.y);
+    }
+
+    @Test
+    public void triangulate4() {
+        List<ScannerData> scanners = new ArrayList<>();
+        Point2D.Double pos;
+
+        // 네 번째 측위 대상자의 첫 번째 타임스탬프 데이터
+        scanners.add(new ScannerData("SCAN-C", 1L, -40));
+
+        pos = locationTriangulator.getPosition(scanners);
+        log.info("Beacon(4) pos(1): {}, {}", pos.x, pos.y);
+    }
+
+    @Test
+    public void triangulate5() {
+        List<ScannerData> scanners = new ArrayList<>();
+        Point2D.Double pos;
+
+        // 다섯 번째 측위 대상자의 첫 번째 타임스탬프 데이터
+        scanners.add(new ScannerData("SCAN-B", 1L, -75));
+        scanners.add(new ScannerData("SCAN-C", 1L, -70));
+
+        pos = locationTriangulator.getPosition(scanners);
+        log.info("Beacon(5) pos(1): {}, {}", pos.x, pos.y);
+    }
+
+    @Test
+    public void triangulate6() {
+        List<ScannerData> scanners = new ArrayList<>();
+        Point2D.Double pos;
+
+        // 여섯 번째 측위 대상자의 첫 번째 타임스탬프 데이터
+        scanners.add(new ScannerData("SCAN-A", 1L, -15));
+        scanners.add(new ScannerData("SCAN-B", 1L, -35));
+        scanners.add(new ScannerData("SCAN-C", 1L, -20));
+
+        pos = locationTriangulator.getPosition(scanners);
+        log.info("Beacon(6) pos(1): {}, {}", pos.x, pos.y);
     }
 }
