@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/platform-tech/static/css/tracking.css">
+    <link rel="stylesheet" href="/css/tracking.css">
+    <script src="/js/sockjs.min.js"></script>
+    <script src="/js/stomp.min.js"></script>
 </head>
 <body>
 <div id="fixed-dot-container">
@@ -18,16 +20,22 @@
     <table>
         <thead>
         <tr>
-            <th>Scanner</th>
+            <th>KEY</th>
+            <th>NAME</th>
             <th>A</th>
             <th>B</th>
             <th>C</th>
             <th>D</th>
+            <th>X</th>
+            <th>Y</th>
         </tr>
         </thead>
         <tbody>
         <tr>
-            <th>RSSI</th>
+            <th>VALUE</th>
+            <td></td>
+            <td></td>
+            <td></td>
             <td></td>
             <td></td>
             <td></td>
@@ -37,7 +45,44 @@
     </table>
 </div>
 
-<script src="/platform-tech/static/js/tracking.js"></script>
+
+
+<script src="/js/tracking.js"></script>
+
+<script>
+    function stompClient(endpoint, destination, callback) {
+        var socket = new SockJS(endpoint);
+        var stompClient = Stomp.over(socket);
+    
+        stompClient.connect({}, function(frame) {
+            stompClient.subscribe(destination, callback);
+        });
+    
+        return stompClient;
+    }
+    
+
+
+    const posClient = stompClient("/ws", "/loc/pos", (message) => {
+    var data = JSON.parse(message.body);
+    
+    if (Array.isArray(data) && data.length > 0) {
+        var position = data[0].pos;
+        var pseudonym = data[0].pseudonym || "N/A";
+
+        if (position) {
+            updateCurrentPosition(position.x, position.y); // 현재 위치 업데이트
+            var tableRow = document.querySelector("#table-container table tbody tr");
+                tableRow.cells[1].textContent = pseudonym;
+                tableRow.cells[6].textContent = position.x;
+                tableRow.cells[7].textContent = position.y;
+        }
+    }
+});
+</script>
+
+
+
 
 </body>
 </html>

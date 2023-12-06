@@ -77,4 +77,4 @@ public class LocationPublisher {
 
         messagingTemplate.convertAndSend(WebSocketConfig.WS_POSITION_TOPIC, msg);
     }
-}
+} 

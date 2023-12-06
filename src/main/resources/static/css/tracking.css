@@ -6,7 +6,7 @@
     height: 225px;
     z-index: 1;
     overflow: hidden;
-    background: url(/platform-tech/static/img/map27.jpg);
+    background: url(/img/map27.jpg);
     background-position: calc(50% + 150px) calc(50% + 210px);
     background-size: 237%;
 }
