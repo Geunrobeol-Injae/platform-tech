@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,35 +17,40 @@
     <div class="fixed-dot" style="left: 183px;top: -5px;">스캐너</div>
 </div>
 <div id="canvas"></div>
-<div id="table-container">
-    <table>
-        <thead>
-        <tr>
-            <th>KEY</th>
-            <th>NAME</th>
-            <th>A</th>
-            <th>B</th>
-            <th>C</th>
-            <th>D</th>
-            <th>X</th>
-            <th>Y</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <th>VALUE</th>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        </tbody>
-    </table>
-</div>
 
+
+<div id="data-container">
+    <div class="table-container" id="scanner-data-container">
+        <table id="scanner-table">
+            <thead>
+                <tr>
+                    <th>beaconId</th>
+                    <th>RSSI A</th>
+                    <th>RSSI B</th>
+                    <th>RSSI C</th>
+                    <th>RSSI D</th>
+                </tr>
+            </thead>
+            <tbody id="scanner-tbody">
+                <!-- 스캐너 데이터 -->
+            </tbody>
+        </table>
+    </div>
+    <div class="table-container" id="position-data-container">
+        <table id="position-table">
+            <thead>
+                <tr>
+                    <th>NAME</th>
+                    <th>X</th>
+                    <th>Y</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 위치 데이터 -->
+            </tbody>
+        </table>
+    </div>
+</div>
 
 
 <script src="/js/tracking.js"></script>
@@ -61,24 +67,77 @@
         return stompClient;
     }
     
-
-
     const posClient = stompClient("/ws", "/loc/pos", (message) => {
     var data = JSON.parse(message.body);
-    
-    if (Array.isArray(data) && data.length > 0) {
-        var position = data[0].pos;
-        var pseudonym = data[0].pseudonym || "N/A";
+    updatePositionTable(data);
+    });
 
-        if (position) {
-            updateCurrentPosition(position.x, position.y); // 현재 위치 업데이트
-            var tableRow = document.querySelector("#table-container table tbody tr");
-                tableRow.cells[1].textContent = pseudonym;
-                tableRow.cells[6].textContent = position.x;
-                tableRow.cells[7].textContent = position.y;
+
+    function updatePositionTable(data) {
+            var positionTable = document.getElementById("position-table");
+            var tbody = positionTable.querySelector("tbody");
+
+            data.forEach(item => {
+                var pseudonym = item.pseudonym || "N/A";
+                var existingRow = findRowByPseudonym(tbody, pseudonym);
+                if (existingRow) {
+                    // 기존 행 업데이트
+                    existingRow.cells[1].textContent = item.pos.x;
+                    existingRow.cells[2].textContent = item.pos.y;
+                } else {
+                    // 새 행 추가
+                    var row = tbody.insertRow();
+                    row.insertCell().textContent = pseudonym; // 이름
+                    row.insertCell().textContent = item.pos.x; // X 좌표
+                    row.insertCell().textContent = item.pos.y; // Y 좌표
+                }
+            });
         }
+
+    function findRowByPseudonym(tbody, pseudonym) {
+        for (var i = 0; i < tbody.rows.length; i++) {
+            if (tbody.rows[i].cells[0].textContent === pseudonym) {
+               return tbody.rows[i];
+            }
+        }
+        return null;
     }
-});
+
+
+    var scannerData = {};
+
+    function updateScannerData(message) {
+        var data = JSON.parse(message.body);
+        data.beacons.forEach(beacon => {
+            if (!scannerData[beacon.beaconId]) {
+                scannerData[beacon.beaconId] = { 'RSSI A': '', 'RSSI B': '', 'RSSI C': '', 'RSSI D': '' };
+            }
+            scannerData[beacon.beaconId]['RSSI ' + data.scannerId.split('-')[1]] = beacon.rssi;
+        });
+        updateScannerTable();
+    }
+
+    function updateScannerTable() {
+        var scannerTable = document.getElementById("scanner-table");
+        var tbody = scannerTable.querySelector("tbody");
+
+        tbody.innerHTML = ''; // 기존 데이터 초기화
+
+        Object.keys(scannerData).forEach(beaconId => {
+            var row = tbody.insertRow();
+            row.insertCell().textContent = beaconId;
+            row.insertCell().textContent = scannerData[beaconId]['RSSI A'];
+            row.insertCell().textContent = scannerData[beaconId]['RSSI B'];
+            row.insertCell().textContent = scannerData[beaconId]['RSSI C'];
+            row.insertCell().textContent = scannerData[beaconId]['RSSI D'];
+        });
+    }
+
+    const scClient = stompClient("/ws", "/loc/sc", (message) => {
+        updateScannerData(message);
+    });
+
+
 </script>
 
 

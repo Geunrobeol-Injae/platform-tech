@@ -71,3 +71,16 @@ th, td {
     padding: 8px;
     text-align: left;
 }
+
+
+
+#data-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+}
+
+.table-container {
+    flex: 1; 
+    margin: 0 5px; 
+}
