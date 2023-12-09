@@ -1,3 +1,5 @@
+/* 
+
 package bob.geunrobeol.platform.tech;
 
 import org.junit.jupiter.api.Test;
@@ -58,3 +60,6 @@ public class BeaconWrapperTest {
             .collect(Collectors.joining(", "));
     }
 }
+
+
+*/

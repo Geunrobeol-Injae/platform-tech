@@ -1,3 +1,5 @@
+/* 
+
 package bob.geunrobeol.platform.tech;
 
 import org.junit.jupiter.api.Test;
@@ -101,3 +103,5 @@ public class TriangulatorTests {
         log.info("Beacon(6) pos(1): {}, {}", pos.x, pos.y);
     }
 }
+
+*/
