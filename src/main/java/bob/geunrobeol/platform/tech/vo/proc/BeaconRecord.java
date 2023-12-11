@@ -15,18 +15,18 @@ import bob.geunrobeol.platform.tech.vo.raw.ScannerRecord;
  * @see ScannerRecord
  */
 public class BeaconRecord {
-    private String pseudonym;
+    private String beaconId;
     private List<ScannerData> scanners;
     private Map<String, Integer> payloads;
 
-    public BeaconRecord(String pseudonym, List<ScannerData> scanners, Map<String, Integer> payloads) {
-        this.pseudonym = pseudonym;
+    public BeaconRecord(String beaconId, List<ScannerData> scanners, Map<String, Integer> payloads) {
+        this.beaconId = beaconId;
         this.scanners = scanners;
         this.payloads = payloads;
     }
 
-    public String getPseudonym() {
-        return pseudonym;
+    public String getBeaconId() {
+        return beaconId;
     }
 
     public long getTimestamp() {
@@ -47,7 +47,7 @@ public class BeaconRecord {
     @Override
     public String toString() {
         return "BeaconRecord{" +
-                "pseudonym='" + pseudonym + '\'' +
+                "pseudonym='" + beaconId + '\'' +
                 ", scanners=" + scanners +
                 ", payloads=" + payloads +
                 '}';

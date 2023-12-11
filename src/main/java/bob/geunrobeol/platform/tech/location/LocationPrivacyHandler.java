@@ -2,7 +2,6 @@ package bob.geunrobeol.platform.tech.location;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,12 +24,6 @@ public class LocationPrivacyHandler implements ILocationPreprocessor {
      * BeaconId를 Key로 가지는 HashMap
      */
     HashMap<String, BeaconWrapper> beaconMap = new HashMap<>();
-
-    @Autowired
-    private LocationPrivacyPublisher publisher;
-
-    @Autowired
-    private PseudonymProvider pseudonymProvider;
 
     /**
      * Scanner로부터 수신된 데이터를 입력한다. 입력 과정에서 데이터 전처리와 동시에
@@ -56,12 +49,6 @@ public class LocationPrivacyHandler implements ILocationPreprocessor {
             try {
                 // Push Scanned Results
                 bw.putScanner(scanner, beacon);
-
-                if (bw.isPseudonymExpired()) {
-                    String newPseudonym = pseudonymProvider.refresh(bw.getPseudonym(), scanner.scannerId());
-                    bw.setPseudonym(newPseudonym);
-                }
-
             } finally {
                 // Unlock beacon
                 bw.getRwLock().writeLock().unlock();

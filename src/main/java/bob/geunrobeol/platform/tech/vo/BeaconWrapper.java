@@ -2,10 +2,8 @@ package bob.geunrobeol.platform.tech.vo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -26,17 +24,11 @@ public class BeaconWrapper {
     private final Map<String, ScannerData> scannerMap;
     private final List<Map<String, Integer>> payloadsList;
 
-    // Psudonymization & Dummization
-    private String pseudonym;
-    private final Set<String> psudonymScanners;
-
     public BeaconWrapper(String beaconId) {
         this.beaconId = beaconId;
         this.rwLock = new ReentrantReadWriteLock();
         this.scannerMap = new HashMap<>();
         this.payloadsList = new ArrayList<>();
-        this.pseudonym = "";
-        this.psudonymScanners = new HashSet<>();
     }
 
     public ReadWriteLock getRwLock() {
@@ -76,7 +68,7 @@ public class BeaconWrapper {
                 .forEach(e -> payloads.compute(e.getKey(),
                         (k, v) -> v == null ? e.getValue() : Math.max(v, e.getValue())));
     
-        return new BeaconRecord(pseudonym, scanners, payloads);
+        return new BeaconRecord(beaconId, scanners, payloads);
     }
     
     
@@ -99,14 +91,6 @@ public class BeaconWrapper {
             scanner.updateRssi(s.timestamp(), b.rssi());
             rssi = scanner.getRssi();
         }
-        
-
-
-        // Count Pseudonymization
-        if (rssi <= LocationPrivacyConfig.PSEUDONYM_RSSI) {
-            psudonymScanners.add(s.scannerId());
-        }
-
 
         // PAYLOAD_FLUSH_MAX을 초과하는지 확인
         if (payloadsList.size() > LocationPrivacyConfig.PAYLOAD_FLUSH_MAX) {
@@ -118,27 +102,12 @@ public class BeaconWrapper {
         }
     }
 
-    public boolean isPseudonymExpired() {
-        return psudonymScanners.size() >= LocationPrivacyConfig.PSEUDONYM_MAX_SCANNERS;
-    }
-
-    public String getPseudonym() {
-        return pseudonym;
-    }
-
-    public void setPseudonym(String pseudonym) {
-        psudonymScanners.clear();
-        this.pseudonym = pseudonym;
-    }
-
     @Override
     public String toString() {
         return "BeaconWrapper{" +
                 "beaconId='" + beaconId + '\'' +
-                ", pseudonym='" + pseudonym + '\'' +
                 ", scannerMap=" + scannerMap +
                 ", payloadsList=" + payloadsList +
-                ", psudonymScanners=" + psudonymScanners +
                 '}';
     }
 }

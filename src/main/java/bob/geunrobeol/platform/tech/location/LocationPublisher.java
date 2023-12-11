@@ -60,13 +60,11 @@ public class LocationPublisher {
         List<BeaconRecord> records = locationPreprocessor.popBeaconRecord();
         List<BeaconPosition> positions = new ArrayList<>();
         for (BeaconRecord r : records) {
-            positions.add(new BeaconPosition(r.getPseudonym(),
+            positions.add(new BeaconPosition(r.getBeaconId(),
                     r.getTimestamp(),
                     locationEstimator.getPosition(r.getScanners()),
                     r.getPayloads()));
         }
-
-        // TODO save positions
 
         String msg = "[]";
         try {
@@ -77,4 +75,4 @@ public class LocationPublisher {
 
         messagingTemplate.convertAndSend(WebSocketConfig.WS_POSITION_TOPIC, msg);
     }
-} 
+}
