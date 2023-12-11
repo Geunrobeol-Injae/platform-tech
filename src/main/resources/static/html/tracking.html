@@ -78,8 +78,8 @@
             var tbody = positionTable.querySelector("tbody");
 
             data.forEach(item => {
-                var pseudonym = item.pseudonym || "N/A";
-                var existingRow = findRowByPseudonym(tbody, pseudonym);
+                var beaconId = item.beaconId || "N/A";
+                var existingRow = findRowByBeaconId(tbody, beaconId);
                 if (existingRow) {
                     // 기존 행 업데이트
                     existingRow.cells[1].textContent = item.pos.x;
@@ -87,16 +87,16 @@
                 } else {
                     // 새 행 추가
                     var row = tbody.insertRow();
-                    row.insertCell().textContent = pseudonym; // 이름
+                    row.insertCell().textContent = beaconId; // 이름
                     row.insertCell().textContent = item.pos.x; // X 좌표
                     row.insertCell().textContent = item.pos.y; // Y 좌표
                 }
             });
         }
 
-    function findRowByPseudonym(tbody, pseudonym) {
+    function findRowByBeaconId(tbody, beaconId) {
         for (var i = 0; i < tbody.rows.length; i++) {
-            if (tbody.rows[i].cells[0].textContent === pseudonym) {
+            if (tbody.rows[i].cells[0].textContent === beaconId) {
                return tbody.rows[i];
             }
         }

@@ -47,7 +47,7 @@ public class BeaconRecord {
     @Override
     public String toString() {
         return "BeaconRecord{" +
-                "pseudonym='" + beaconId + '\'' +
+                "beaconId='" + beaconId + '\'' +
                 ", scanners=" + scanners +
                 ", payloads=" + payloads +
                 '}';
