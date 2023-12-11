@@ -5,3 +5,7 @@
 ## Video
 
 ## Location
+
+### Prerequisites
+
+* AWS Credentials (in `~/.aws`)

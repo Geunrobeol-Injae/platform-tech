@@ -20,22 +20,11 @@ dependencies {
 	implementation("org.springframework:spring-websocket")
 	implementation("org.springframework:spring-messaging")
 	implementation("software.amazon.kinesis:amazon-kinesis-client:2.5.1")
+	implementation(files("./libs/libjgroupsig-1.0.0.jar"))
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
-
-	//추가
-	implementation(files("/home/ysh/platform-tech/libs/libjgroupsig-1.1.0.jar"))
-
 }
 
 tasks.withType<Test> {
-    classpath = files(classpath, "libs/libjgroupsig-0.1.jar")
-
-    jvmArgs("-Djava.library.path=./libs")
 	useJUnitPlatform()
-}
-
-tasks.withType<org.springframework.boot.gradle.tasks.run.BootRun> {
-    classpath = files(classpath, "libs/libjgroupsig-0.1.jar")
-    jvmArgs("-Djava.library.path=./libs")
 }

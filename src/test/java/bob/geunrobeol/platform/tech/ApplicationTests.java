@@ -1,5 +1,3 @@
-/* 
-
 package bob.geunrobeol.platform.tech;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,5 +17,3 @@ class ApplicationTests {
 		log.info("Hello World!");
 	}
 }
-
-*/

@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  app:
+    build: .
+    environment:
+      - TZ=Asia/Seoul
+    volumes:
+      - ./:/app
+      - ~/.aws:/root/.aws
+    ports:
+      - 8080:8080
+  # command: ./gradlew bootRun
