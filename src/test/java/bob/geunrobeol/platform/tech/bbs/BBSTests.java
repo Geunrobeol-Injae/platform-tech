@@ -5,6 +5,10 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import bob.geunrobeol.platform.tech.location.Company;
+import bob.geunrobeol.platform.tech.location.Employee;
+import bob.geunrobeol.platform.tech.location.ThirdParty;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -56,94 +60,6 @@ public class BBSTests {
         // Setup company
         List<String> authKeyTable = thirdParty.getAuthKeys();
         company = new Company(authKeyTable);
-    }
-    @Test
-    public void decodeSigText() {
-        // Sign
-        String sigText = employee1.signBeacon();
-        log.info("string length: {}", sigText.length());
-
-        // Compress
-        String compSigText = compress(sigText);
-        log.info("compressed length: {}", compSigText.length());
-
-        // Decode
-        byte[] bytes = Base64.getMimeDecoder().decode(sigText);
-        log.info("byte length: {}", bytes.length);
-
-        // Compress
-        byte[] compBytes = compress(bytes);
-        log.info("compressed length: {}", compBytes.length);
-
-        // Hex
-        StringBuffer hex = new StringBuffer();
-        for (byte b : bytes) hex.append(String.format("%02X", b));
-        log.info("Hex: {}", hex);
-    }
-
-    public static byte[] compress(byte[] data) {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        try {
-            try (GZIPOutputStream gzipOutputStream = new GZIPOutputStream(byteArrayOutputStream)) {
-                gzipOutputStream.write(data);
-            }
-        } catch (IOException e) {
-            e.printStackTrace(); // Handle the exception as needed
-        }
-        return byteArrayOutputStream.toByteArray();
-    }
-
-    public static byte[] decompress(byte[] compressedData) {
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(compressedData);
-        try {
-            try (GZIPInputStream gzipInputStream = new GZIPInputStream(byteArrayInputStream);
-                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-
-                byte[] buffer = new byte[1024];
-                int bytesRead;
-                while ((bytesRead = gzipInputStream.read(buffer)) != -1) {
-                    byteArrayOutputStream.write(buffer, 0, bytesRead);
-                }
-
-                return byteArrayOutputStream.toByteArray();
-            }
-        } catch (IOException e) {
-            e.printStackTrace(); // Handle the exception as needed
-            return new byte[0]; // or throw a custom exception, return an empty array, etc.
-        }
-    }
-
-    private static String compress(String input) {
-        try {
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(input.length());
-            try (GZIPOutputStream gzipOutputStream = new GZIPOutputStream(byteArrayOutputStream)) {
-                gzipOutputStream.write(input.getBytes("UTF-8"));
-            }
-            byte[] compressedBytes = byteArrayOutputStream.toByteArray();
-            return Base64.getEncoder().encodeToString(compressedBytes);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private static String decompress(String compressedInput) {
-        try {
-            byte[] compressedBytes = Base64.getDecoder().decode(compressedInput);
-            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(compressedBytes);
-            try (GZIPInputStream gzipInputStream = new GZIPInputStream(byteArrayInputStream)) {
-                byte[] buffer = new byte[1024];
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                int len;
-                while ((len = gzipInputStream.read(buffer)) > 0) {
-                    byteArrayOutputStream.write(buffer, 0, len);
-                }
-                return byteArrayOutputStream.toString("UTF-8");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 
     @Test

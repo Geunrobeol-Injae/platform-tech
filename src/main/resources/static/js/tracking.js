@@ -47,13 +47,13 @@ function drawPath() {
 }
 
 setInterval(function() {
-    var positionTable = document.getElementById("position-table");
-    var rows = positionTable.querySelectorAll("tbody tr");
+    var combinedTable = document.getElementById("combined-table");
+    var rows = combinedTable.querySelectorAll("tbody tr");
 
     rows.forEach(row => {
         var name = row.cells[0].textContent;
-        var x = parseFloat(row.cells[1].textContent);
-        var y = parseFloat(row.cells[2].textContent);
+        var x = parseFloat(row.cells[5].textContent); 
+        var y = parseFloat(row.cells[6].textContent); 
         updateCurrentPosition(name, x, y);
     });
 

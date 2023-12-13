@@ -19,37 +19,23 @@
 <div id="canvas"></div>
 
 
-<div id="data-container">
-    <div class="table-container" id="scanner-data-container">
-        <table id="scanner-table">
-            <thead>
-                <tr>
-                    <th>beaconId</th>
-                    <th>RSSI A</th>
-                    <th>RSSI B</th>
-                    <th>RSSI C</th>
-                    <th>RSSI D</th>
-                </tr>
-            </thead>
-            <tbody id="scanner-tbody">
-                <!-- 스캐너 데이터 -->
-            </tbody>
-        </table>
-    </div>
-    <div class="table-container" id="position-data-container">
-        <table id="position-table">
-            <thead>
-                <tr>
-                    <th>NAME</th>
-                    <th>X</th>
-                    <th>Y</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- 위치 데이터 -->
-            </tbody>
-        </table>
-    </div>
+<div class="table-container" id="combined-data-container">
+    <table id="combined-table">
+        <thead>
+            <tr>
+                <th>beaconId</th>
+                <th>RSSI A</th>
+                <th>RSSI B</th>
+                <th>RSSI C</th>
+                <th>RSSI D</th>
+                <th>X</th>
+                <th>Y</th>
+            </tr>
+        </thead>
+        <tbody id="combined-tbody">
+            <!-- 통합된 데이터 -->
+        </tbody>
+    </table>
 </div>
 
 
@@ -67,74 +53,57 @@
         return stompClient;
     }
     
-    const posClient = stompClient("/ws", "/loc/pos", (message) => {
-    var data = JSON.parse(message.body);
-    updatePositionTable(data);
-    });
+    var combinedData = {};
 
+    function updateCombinedData() {
+        var combinedTable = document.getElementById("combined-table");
+        var tbody = combinedTable.querySelector("tbody");
+        tbody.innerHTML = ''; // 기존 데이터 초기화
 
-    function updatePositionTable(data) {
-            var positionTable = document.getElementById("position-table");
-            var tbody = positionTable.querySelector("tbody");
-
-            data.forEach(item => {
-                var beaconId = item.beaconId || "N/A";
-                var existingRow = findRowByBeaconId(tbody, beaconId);
-                if (existingRow) {
-                    // 기존 행 업데이트
-                    existingRow.cells[1].textContent = item.pos.x;
-                    existingRow.cells[2].textContent = item.pos.y;
-                } else {
-                    // 새 행 추가
-                    var row = tbody.insertRow();
-                    row.insertCell().textContent = beaconId; // 이름
-                    row.insertCell().textContent = item.pos.x; // X 좌표
-                    row.insertCell().textContent = item.pos.y; // Y 좌표
-                }
-            });
-        }
-
-    function findRowByBeaconId(tbody, beaconId) {
-        for (var i = 0; i < tbody.rows.length; i++) {
-            if (tbody.rows[i].cells[0].textContent === beaconId) {
-               return tbody.rows[i];
-            }
-        }
-        return null;
+        Object.keys(combinedData).forEach(beaconId => {
+            var row = tbody.insertRow();
+            var beaconData = combinedData[beaconId];
+            row.insertCell().textContent = beaconId;
+            row.insertCell().textContent = beaconData['RSSI A'] || '';
+            row.insertCell().textContent = beaconData['RSSI B'] || '';
+            row.insertCell().textContent = beaconData['RSSI C'] || '';
+            row.insertCell().textContent = beaconData['RSSI D'] || '';
+            row.insertCell().textContent = beaconData['X'] || '';
+            row.insertCell().textContent = beaconData['Y'] || '';
+        });
     }
-
-
-    var scannerData = {};
 
     function updateScannerData(message) {
         var data = JSON.parse(message.body);
         data.beacons.forEach(beacon => {
-            if (!scannerData[beacon.beaconId]) {
-                scannerData[beacon.beaconId] = { 'RSSI A': '', 'RSSI B': '', 'RSSI C': '', 'RSSI D': '' };
+            if (!combinedData[beacon.beaconId]) {
+                combinedData[beacon.beaconId] = { 'RSSI A': '', 'RSSI B': '', 'RSSI C': '', 'RSSI D': '' };
             }
-            scannerData[beacon.beaconId]['RSSI ' + data.scannerId.split('-')[1]] = beacon.rssi;
-        });
-        updateScannerTable();
-    }
-
-    function updateScannerTable() {
-        var scannerTable = document.getElementById("scanner-table");
-        var tbody = scannerTable.querySelector("tbody");
-
-        tbody.innerHTML = ''; // 기존 데이터 초기화
-
-        Object.keys(scannerData).forEach(beaconId => {
-            var row = tbody.insertRow();
-            row.insertCell().textContent = beaconId;
-            row.insertCell().textContent = scannerData[beaconId]['RSSI A'];
-            row.insertCell().textContent = scannerData[beaconId]['RSSI B'];
-            row.insertCell().textContent = scannerData[beaconId]['RSSI C'];
-            row.insertCell().textContent = scannerData[beaconId]['RSSI D'];
+            combinedData[beacon.beaconId]['RSSI ' + data.scannerId.split('-')[1]] = beacon.rssi;
+            updateCombinedData(); // 테이블 업데이트 호출
         });
     }
+
+    function updatePositionData(data) {
+    data.forEach(item => {
+        if (!combinedData[item.beaconId]) {
+            combinedData[item.beaconId] = { 'X': '', 'Y': '', 'RSSI A': '', 'RSSI B': '', 'RSSI C': '', 'RSSI D': '' };
+        }
+        combinedData[item.beaconId]['X'] = parseFloat(item.pos.x).toFixed(2); // X 좌표를 소수점 5자리까지 표시
+        combinedData[item.beaconId]['Y'] = parseFloat(item.pos.y).toFixed(2); // Y 좌표를 소수점 5자리까지 표시
+        updateCombinedData(); // 테이블 업데이트 호출
+    });
+}
+
+
+    const posClient = stompClient("/ws", "/loc/pos", (message) => {
+        var data = JSON.parse(message.body);
+        updatePositionData(data); // 위치 데이터 업데이트 함수 호출
+    });
+
 
     const scClient = stompClient("/ws", "/loc/sc", (message) => {
-        updateScannerData(message);
+        updateScannerData(message); // 스캐너 데이터 업데이트 함수 호출
     });
 
 

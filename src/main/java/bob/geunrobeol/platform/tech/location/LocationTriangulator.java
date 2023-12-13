@@ -100,7 +100,7 @@ public class LocationTriangulator implements ILocationEstimator {
     private double calculateDistanceFromRssi(double rssi) {
         double referenceRssi = -50.0;
         double pathLossParameter = 3.0;
-        double referenceDistance = 100.0;
+        double referenceDistance = 60.0;
     
         return Math.pow(10.0, (referenceRssi - rssi) / (10.0 * pathLossParameter)) * referenceDistance;
     }
@@ -144,24 +144,36 @@ public class LocationTriangulator implements ILocationEstimator {
      * @param radius2 두 번째 원의 반지름
      * @return 교점 목록
      */
-     private List<Point2D.Double> calculateIntersections(Point2D.Double center1, double radius1, Point2D.Double center2, double radius2) {
+    private List<Point2D.Double> calculateIntersections(Point2D.Double center1, double radius1, Point2D.Double center2, double radius2) {
         List<Point2D.Double> intersections = new ArrayList<>();
         double d = center1.distance(center2);
+    
+        // 두 원이 완전히 일치하거나 서로 만나지 않는 경우
+        if (d == 0 && radius1 == radius2 || d > radius1 + radius2 || d < Math.abs(radius1 - radius2)) {
+            intersections.add(new Point2D.Double(1, 1)); // 기본값
+            return intersections;
+        }
+    
         double a = (radius1 * radius1 - radius2 * radius2 + d * d) / (2 * d);
         double h = Math.sqrt(radius1 * radius1 - a * a);
         double x2 = center1.x + a * (center2.x - center1.x) / d;
         double y2 = center1.y + a * (center2.y - center1.y) / d;
     
-        if (h == 0) { // 하나의 교점
+        // 두 원이 하나의 점에서 만나는 경우
+        if (h == 0) {
             intersections.add(new Point2D.Double(x2, y2));
-        } else { // 두 개의 교점
-            double rx = -(center2.y - center1.y) * (h / d);
-            double ry = (center2.x - center1.x) * (h / d);
-    
-            intersections.add(new Point2D.Double(x2 + rx, y2 + ry));
-            intersections.add(new Point2D.Double(x2 - rx, y2 - ry));
+            return intersections;
         }
-        return intersections;
+    
+        double rx = -(center2.y - center1.y) * (h / d);
+        double ry = (center2.x - center1.x) * (h / d);
+    
+        intersections.add(new Point2D.Double(x2 + rx, y2 + ry));
+        intersections.add(new Point2D.Double(x2 - rx, y2 - ry));
+    
+        // 교점이 여러 개인 경우 랜덤으로 하나 선택
+        Random rand = new Random();
+        return intersections.subList(rand.nextInt(intersections.size()), rand.nextInt(intersections.size()) + 1);
     }
     
 }
