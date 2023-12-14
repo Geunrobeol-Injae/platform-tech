@@ -35,16 +35,10 @@ public class BeaconWrapper {
         return rwLock;
     }
 
-    
-
-
     public BeaconRecord getBeaconRecord() {
         
         // Scanners
         List<ScannerData> scanners = new ArrayList<>(scannerMap.values());
-
-        String sigText = "sigText1"; // 더미 데이터
-        int authId = 1;              // 더미 데이터
 
 
         // Dummy the location 
@@ -70,9 +64,9 @@ public class BeaconWrapper {
                 .forEach(e -> payloads.compute(e.getKey(),
                         (k, v) -> v == null ? e.getValue() : Math.max(v, e.getValue())));
     
-        return new BeaconRecord(beaconId, sigText, authId, scanners, payloads);
+        return new BeaconRecord(beaconId, null, -1, scanners, payloads);
     }
-    
+
 
 
     public void putScanner(ScannerRecord s, BeaconData b) {

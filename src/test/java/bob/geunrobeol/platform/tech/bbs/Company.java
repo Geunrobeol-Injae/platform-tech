@@ -1,34 +1,19 @@
-package bob.geunrobeol.platform.tech.location;
+package bob.geunrobeol.platform.tech.bbs;
 
 import com.ibm.jgroupsig.BBS04;
 import com.ibm.jgroupsig.GS;
 import com.ibm.jgroupsig.GrpKey;
 import com.ibm.jgroupsig.Signature;
 
-import bob.geunrobeol.platform.tech.dto.AuthKeyS;
-
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import java.io.Serializable;
+import bob.geunrobeol.platform.tech.verify.AuthKey;
+import bob.geunrobeol.platform.tech.verify.AuthKeyS;
 
 public class Company {
-    private static class AuthKey {
-        public final int authId;
-        public final BBS04 bbs04;
-        public final String zones;
 
-        public AuthKey(int authId, BBS04 bbs04, String zones) {
-            this.authId = authId;
-            this.bbs04 = bbs04;
-            this.zones = zones;
-        }
-    }
-
-
-    
     private final Map<Integer, AuthKey> authKeys;
     private final Map<String, String> identities;
 

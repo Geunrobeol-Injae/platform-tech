@@ -1,4 +1,4 @@
-package bob.geunrobeol.platform.tech.location;
+package bob.geunrobeol.platform.tech.bbs;
 
 import com.ibm.jgroupsig.BBS04;
 import com.ibm.jgroupsig.GS;

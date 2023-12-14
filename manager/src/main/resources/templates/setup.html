@@ -184,7 +184,7 @@ function displayResponses(data) {
     const responseList = document.getElementById("responseList");
     responseList.innerHTML = ""; // Clear existing responses
 
-    const sortedEntries = Object.entries(data).sort(([keyA], [keyB]) => keyB.localeCompare(keyA));
+    const sortedEntries = Object.entries(data).sort(([keyA], [keyB]) => keyA.localeCompare(keyB));
 
     for (const [filename, fileContent] of sortedEntries) {
         const listItem = document.createElement("li");

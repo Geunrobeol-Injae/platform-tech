@@ -15,7 +15,7 @@ import java.util.Random;
 
 
 /**
- * 삼각측량법을 구현한 Class.
+ * 삼변측량법을 구현한 Class.
  */
 @Service
 public class LocationTriangulator implements ILocationEstimator {

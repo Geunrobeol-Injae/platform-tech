@@ -1,4 +1,4 @@
-package bob.geunrobeol.platform.tech.manager;
+package bob.geunrobeol.platform.tech.config;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,36 +8,39 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import bob.geunrobeol.platform.tech.manager.dto.AccessAuthS;
-import bob.geunrobeol.platform.tech.manager.dto.IdentityS;
-import bob.geunrobeol.platform.tech.manager.services.GroupManager;
+import bob.geunrobeol.platform.tech.verify.AuthKeyS;
+import bob.geunrobeol.platform.tech.verify.AuthVerifier;
 
 @Configuration
-public class ManagerConfig {
-    private static final Logger log = LoggerFactory.getLogger(ManagerConfig.class);
+public class VerifyConfig {
+
+    private static final Logger log = LoggerFactory.getLogger(VerifyConfig.class);
 
     public static final String KEY_DIR = "keys/";
-    public static final String MGR_ACCESS_AUTHS = "mgr-access-auths.txt";
-    public static final String MGR_IDENTITIES = "mgr-identities.txt";
+
     public static final String GRP_AUTH_KEYS = "grp-auth-keys.txt";
-    public static final String MEM_KEY_FORMAT = "mem-key-%d.txt";
-    public static final String MEM_SIG_FORMAT = "mem-sign-%d.txt";
+
+    public static final String OPEN_URL = "http://manager:8080/open";
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @Bean
-    public GroupManager groupManager() {
-        List<AccessAuthS> accessAuths = readFromFile(KEY_DIR + MGR_ACCESS_AUTHS, AccessAuthS.class);
-        List<IdentityS> identities = readFromFile(KEY_DIR + MGR_IDENTITIES, IdentityS.class);
-        return new GroupManager(accessAuths, identities);
+    AuthVerifier authVerifier() {
+        List<AuthKeyS> authKeySList = readFromFile(KEY_DIR + GRP_AUTH_KEYS, AuthKeyS.class);
+        return new AuthVerifier(restTemplate, authKeySList);
     }
 
     private <T> List<T> readFromFile(String filePath, Class<T> valueType) {
@@ -51,5 +54,10 @@ public class ManagerConfig {
         } catch (IOException e) {
             throw new RuntimeException("Error reading file: " + filePath, e);
         }
+    }
+
+    public static boolean isInDangerZone(Point2D.Double positionPoint) {
+        // X와 Y 좌표가 10 이상 20 이하인 경우 위험 구역으로 간주한다고 가정
+        return positionPoint.x >= 10 && positionPoint.x <= 20 && positionPoint.y >= 10 && positionPoint.y <= 20;
     }
 }

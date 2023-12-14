@@ -5,21 +5,11 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import bob.geunrobeol.platform.tech.location.Company;
-import bob.geunrobeol.platform.tech.location.Employee;
-import bob.geunrobeol.platform.tech.location.ThirdParty;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 public class BBSTests {
 
@@ -81,9 +71,6 @@ public class BBSTests {
         // open
         Map.Entry<String, String> kv = thirdParty.open(sigText);
         if (kv == null) throw new RuntimeException("open.fail");
-
-        employee1.appendOpenLog(kv.getValue());
-        company.appendIdentity(sigText, kv.getKey());
 
         log.info("open identity: {}", kv.getKey());
         log.info("open log: {}", kv.getValue());

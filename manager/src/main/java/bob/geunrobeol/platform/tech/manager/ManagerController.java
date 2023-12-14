@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.Map;
 
 import bob.geunrobeol.platform.tech.manager.dto.AccessAuthF;
 import bob.geunrobeol.platform.tech.manager.dto.EmployeeF;
+import bob.geunrobeol.platform.tech.manager.dto.OpenReqS;
 import bob.geunrobeol.platform.tech.manager.services.GroupBuilder;
 import bob.geunrobeol.platform.tech.manager.services.GroupManager;
 import bob.geunrobeol.platform.tech.manager.vo.Identity;
@@ -41,7 +43,7 @@ public class ManagerController {
     @Autowired
     private GroupManager groupManager;
 
-    private List<Map<String, String>> openLogs;
+    private List<Map<String, String>> openLogs = new ArrayList<>();
 
     private record SetupParam (List<AccessAuthF> accessAuths, List<EmployeeF> employees) {}
 
@@ -73,9 +75,9 @@ public class ManagerController {
     }
 
     @PostMapping(value = "/open") @ResponseBody
-    public ResponseEntity<Map<String, String>> open(@RequestBody Map<String, String> reqBody) {
+    public ResponseEntity<Map<String, String>> open(@RequestBody OpenReqS openReq) {
         // Open
-        Map.Entry<Identity, Map<String, String>> idAndLog = groupManager.open(reqBody.get("sigText"));
+        Map.Entry<Identity, Map<String, String>> idAndLog = groupManager.open(openReq.sigText());
 
         // Identity
         Map<String, String> idMap = new HashMap<>();
@@ -86,8 +88,8 @@ public class ManagerController {
         Map<String, String> logMap = idAndLog.getValue();
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         logMap.put("timestamp", timestamp);
-        logMap.put("adminId", reqBody.get("adminId"));
-        logMap.put("reason", reqBody.get("reason"));
+        logMap.put("adminId", openReq.adminId());
+        logMap.put("reason", openReq.reason());
         openLogs.add(logMap);
 
         return new ResponseEntity<>(idMap, HttpStatus.OK);

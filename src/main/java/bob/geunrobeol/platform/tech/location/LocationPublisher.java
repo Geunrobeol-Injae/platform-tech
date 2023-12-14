@@ -2,30 +2,24 @@ package bob.geunrobeol.platform.tech.location;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import java.awt.geom.Point2D;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-
+import bob.geunrobeol.platform.tech.config.VerifyConfig;
 import bob.geunrobeol.platform.tech.config.WebSocketConfig;
-import bob.geunrobeol.platform.tech.dto.AuthKeyS;
+import bob.geunrobeol.platform.tech.verify.AuthVerifier;
+import bob.geunrobeol.platform.tech.verify.IdentityS;
 import bob.geunrobeol.platform.tech.vo.BeaconPosition;
 import bob.geunrobeol.platform.tech.vo.proc.BeaconRecord;
 import bob.geunrobeol.platform.tech.vo.raw.ScannerRecord;
@@ -41,9 +35,6 @@ public class LocationPublisher {
     private SimpMessagingTemplate messagingTemplate;
 
     @Autowired
-    private ResourceLoader resourceLoader;
-
-    @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
@@ -52,56 +43,8 @@ public class LocationPublisher {
     @Autowired
     private ILocationEstimator locationEstimator;
 
-    private ThirdParty thirdParty;
-    private Map<Integer, Employee> employees;
-    private Company company;
-
-    private static final List<String> accessAuthTable;
-    static {
-        accessAuthTable = new ArrayList<>();
-        accessAuthTable.add("0,11");
-        accessAuthTable.add("1,10");
-    }
-
-    private static final List<String> employeeTable;
-    static {
-        employeeTable = new ArrayList<>();
-        employeeTable.add("1,ble-w,0");  
-        employeeTable.add("2,ble-y,0");
-        employeeTable.add("3,ble-g,1");
-    }
-
-    public LocationPublisher() {
-        this.thirdParty = new ThirdParty(accessAuthTable);
-
-        
-        this.employees = new HashMap<>();
-        for (String empData : employeeTable) {
-            Employee e = thirdParty.addMember(empData);
-            employees.put(e.id, e);
-        }
-
-
-        List<AuthKeyS> authKeySList = readFromFile("classpath:xyz.txt", AuthKeyS.class);
-        this.company = new Company(authKeySList);
-    }
-
-    private <T> List<T> readFromFile(String filePath, Class<T> valueType) {
-        try {
-            Resource resource = resourceLoader.getResource(filePath);
-            InputStream inputStream = resource.getInputStream();
-
-            return objectMapper.readValue(inputStream, objectMapper.getTypeFactory().constructCollectionType(List.class, valueType));
-        } catch (FileNotFoundException e) {
-            return new ArrayList<>();
-        } catch (IOException e) {
-            throw new RuntimeException("Error reading file: " + filePath, e);
-        }
-    }
-
-
-    
-
+    @Autowired
+    private AuthVerifier authVerifier;
 
      /**
      * Scanner 데이터를 송신한다.
@@ -114,7 +57,6 @@ public class LocationPublisher {
         } catch (JsonProcessingException e) {
             log.error("json.writeValue.error", e);
         }
-
         messagingTemplate.convertAndSend(WebSocketConfig.WS_SCANNER_TOPIC, msg);
     }
 
@@ -133,17 +75,15 @@ public class LocationPublisher {
             positions.add(position);
 
             // 근로자 위치가 위험 구역인지 판단
-            if (isInDangerZone(positionPoint)) {
-                // BeaconRecord에서 sigText와 authId 추출
-                String sigText = r.getSigText();
-                int authId = r.getAuthId();
-
+            if (VerifyConfig.isInDangerZone(positionPoint)) {
                 // 위험 구역 접근 권한 여부 판단
-                if (!company.verifyAccessAuth(sigText, authId)) {
+                if (!authVerifier.verifyAccessAuth(r.getSigText(), r.getAuthId())) {
                     // 위험 구역 접근 권한 없을 시 제3자(Third Party)에게 신원요청 
-                    Map.Entry<String, String> identityInfo = thirdParty.open(sigText);
-                    log.info("Identity opened: {}, Log: {}", identityInfo.getKey(), identityInfo.getValue());
-                    log.warn("Unauthorized access to dangerous area by employee with ID {}.", r.getBeaconId());
+                    IdentityS identity = authVerifier.requestOpen(r.getSigText());
+                    if (identity != null) {
+                        log.info("Unauthorized access to dangerous area by employee with ID {}: {}.", identity.id(), identity.name());
+                        sendAlert(position, identity);
+                    }
                 }
             }
         }
@@ -154,12 +94,26 @@ public class LocationPublisher {
         } catch (JsonProcessingException e) {
             log.error("json.writeValue.error", e);
         }
-
         messagingTemplate.convertAndSend(WebSocketConfig.WS_POSITION_TOPIC, msg);
     }
 
-    private boolean isInDangerZone(Point2D.Double positionPoint) {
-        // X와 Y 좌표가 10 이상 20 이하인 경우 위험 구역으로 간주한다고 가정
-        return positionPoint.x >= 10 && positionPoint.x <= 20 && positionPoint.y >= 10 && positionPoint.y <= 20;
+    private void sendAlert(BeaconPosition pos, IdentityS identity) {
+        Map<String, Object> map = new HashMap<>();
+
+        map.put("timestamp", pos.timestamp());
+        map.put("beaconId", pos.beaconId());
+        map.put("posX", pos.pos().x);
+        map.put("posY", pos.pos().y);
+
+        map.put("id", identity.id());
+        map.put("name", identity.name());
+
+        String msg = "{}";
+        try {
+            msg = objectMapper.writeValueAsString(map);
+        } catch (JsonProcessingException e) {
+            log.error("json.writeValue.error", e);
+        }
+        messagingTemplate.convertAndSend(WebSocketConfig.WS_POSITION_TOPIC, msg);
     }
 }

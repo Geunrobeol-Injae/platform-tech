@@ -13,7 +13,7 @@ import bob.geunrobeol.platform.tech.vo.raw.ScannerRecord;
  * {@link bob.geunrobeol.platform.tech.location.ILocationPreprocessor}를 통해
  * {@link BeaconRecord}로부터 변환되었다.
  * @see ScannerRecord
- */ 
+ */
 public class BeaconRecord {
     private String beaconId;
     private String sigText; 
@@ -44,12 +44,12 @@ public class BeaconRecord {
         return sigText;
     }
 
-    public int getAuthId() {
-        return authId;
-    }
-
     public void setSigText(String sigText) {
         this.sigText = sigText;
+    }
+
+    public int getAuthId() {
+        return authId;
     }
 
     public void setAuthId(int authId) {
@@ -68,6 +68,8 @@ public class BeaconRecord {
     public String toString() {
         return "BeaconRecord{" +
                 "beaconId='" + beaconId + '\'' +
+                ", sigText='" + sigText + '\'' +
+                ", authId=" + authId +
                 ", scanners=" + scanners +
                 ", payloads=" + payloads +
                 '}';
