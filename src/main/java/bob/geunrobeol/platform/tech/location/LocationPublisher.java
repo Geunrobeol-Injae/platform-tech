@@ -82,10 +82,7 @@ public class LocationPublisher {
         }
 
 
-        //this.company = new Company(thirdParty.getAuthKeys());
-        // ThirdParty 인스턴스 데이터를 파일에서 읽어오기
         List<AuthKeyS> authKeySList = readFromFile("classpath:xyz.txt", AuthKeyS.class);
-        // Company 객체 초기화
         this.company = new Company(authKeySList);
     }
 
@@ -135,22 +132,18 @@ public class LocationPublisher {
             BeaconPosition position = new BeaconPosition(r.getBeaconId(), r.getTimestamp(), positionPoint, r.getPayloads());
             positions.add(position);
 
-            // 위험 구역 여부 판단
+            // 근로자 위치가 위험 구역인지 판단
             if (isInDangerZone(positionPoint)) {
-                //Employee employee = employees.get(r.getBeaconId()); //타입 수정해야
-                String sigText = "";
-                int authId = 0;
+                // BeaconRecord에서 sigText와 authId 추출
+                String sigText = r.getSigText();
+                int authId = r.getAuthId();
 
                 // 위험 구역 접근 권한 여부 판단
-                if (!company.verifyAccessAuth(employee.signBeacon(), employee.authId)) {
-                    
-                    // 위험 구역 접근 권한 없을 시 제3자에게 신원요청 
-                    Map.Entry<String, String> identityInfo = thirdParty.open(employee.signBeacon());
+                if (!company.verifyAccessAuth(sigText, authId)) {
+                    // 위험 구역 접근 권한 없을 시 제3자(Third Party)에게 신원요청 
+                    Map.Entry<String, String> identityInfo = thirdParty.open(sigText);
                     log.info("Identity opened: {}, Log: {}", identityInfo.getKey(), identityInfo.getValue());
-                    log.warn("Unauthorized access to dangerous area by employee with ID {}.", employee.id);
-
-                    log.info("open identity: {}", identityInfo.getKey());
-                    log.info("open log: {}", identityInfo.getValue());
+                    log.warn("Unauthorized access to dangerous area by employee with ID {}.", r.getBeaconId());
                 }
             }
         }
@@ -166,7 +159,7 @@ public class LocationPublisher {
     }
 
     private boolean isInDangerZone(Point2D.Double positionPoint) {
-        // X와 Y 좌표가 10 이상 20 이하인 경우 위험 구역으로 간주한다고 가정,
+        // X와 Y 좌표가 10 이상 20 이하인 경우 위험 구역으로 간주한다고 가정
         return positionPoint.x >= 10 && positionPoint.x <= 20 && positionPoint.y >= 10 && positionPoint.y <= 20;
     }
 }

@@ -16,13 +16,15 @@ import bob.geunrobeol.platform.tech.vo.raw.ScannerRecord;
  */
 public class BeaconRecord {
     private String beaconId;
-//어스키 아이디?
-
+    private String sigText; 
+    private int authId; 
     private List<ScannerData> scanners;
     private Map<String, Integer> payloads;
 
-    public BeaconRecord(String beaconId, List<ScannerData> scanners, Map<String, Integer> payloads) {
+    public BeaconRecord(String beaconId, String sigText, int authId, List<ScannerData> scanners, Map<String, Integer> payloads) {
         this.beaconId = beaconId;
+        this.sigText = sigText;
+        this.authId = authId;
         this.scanners = scanners;
         this.payloads = payloads;
     }
@@ -36,6 +38,14 @@ public class BeaconRecord {
                 .map(ScannerData::getTimestamp)
                 .max(Comparator.naturalOrder())
                 .orElse(-1L);
+    }
+
+    public String getSigText() {
+        return sigText;
+    }
+
+    public int getAuthId() {
+        return authId;
     }
 
     public List<ScannerData> getScanners() {
