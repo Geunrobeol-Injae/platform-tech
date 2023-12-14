@@ -5,10 +5,14 @@ import com.ibm.jgroupsig.GS;
 import com.ibm.jgroupsig.GrpKey;
 import com.ibm.jgroupsig.Signature;
 
+import bob.geunrobeol.platform.tech.dto.AuthKeyS;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import java.io.Serializable;
 
 public class Company {
     private static class AuthKey {
@@ -23,6 +27,8 @@ public class Company {
         }
     }
 
+
+    
     private final Map<Integer, AuthKey> authKeys;
     private final Map<String, String> identities;
 
@@ -31,13 +37,44 @@ public class Company {
         this.identities = new HashMap<>();
     }
 
-    public Company(List<String> texts) {
+    public Company(List<AuthKeyS> authKeySList) {
         this();
-        for (String text : texts) {
-            addAuthKey(text);
+        for (AuthKeyS a : authKeySList) {
+            addAuthKey(a);
         }
     }
+    
+    //더 아래있는 addAuthKey는 콤마로 나눔. 이건 역직렬화 통해 필드대로 가져옴. 
+    private void addAuthKey(AuthKeyS a) {
+        int authId = a.authId();
+        String grpKeyText = a.grpKeyText();
+        String zones = a.zones();
 
+        // 중복된 authId 검사
+        if (authKeys.containsKey(authId)) {
+            throw new IllegalArgumentException("Duplicate authId: " + authId);
+        }
+
+        // zones 형식 검증
+        if (!zones.matches("[01]+")) {
+            throw new IllegalArgumentException("Invalid zones format: " + zones);
+        }
+
+        // grpKeyText를 사용하여 BBS04 객체 생성
+        BBS04 bbs04;
+        try {
+            GrpKey grpKey = new GrpKey(GS.BBS04_CODE, grpKeyText);
+            bbs04 = new BBS04();
+            bbs04.setGrpKey(grpKey);
+        } catch (Exception e) {
+            throw new RuntimeException("Error creating BBS04 instance", e);
+        }
+
+        // AuthKey 맵에 추가
+        authKeys.put(authId, new AuthKey(authId, bbs04, zones));
+    }
+
+    /* 
     public void addAuthKey(String text) {
         List<String> parts = Arrays.asList(text.split(","));
         if (parts.size() != 3) throw new IllegalArgumentException("authKey.size");
@@ -64,7 +101,9 @@ public class Company {
 
         authKeys.put(authId, new AuthKey(authId, bbs04, zones));
     }
+    */
 
+    
     public boolean verifyAccessAuth(String sigText, int authId) {
         // retrieve authKey
         AuthKey authKey = authKeys.get(authId);

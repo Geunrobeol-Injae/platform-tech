@@ -58,8 +58,8 @@ public class BBSTests {
         }
 
         // Setup company
-        List<String> authKeyTable = thirdParty.getAuthKeys();
-        company = new Company(authKeyTable);
+        //List<String> authKeyTable = thirdParty.getAuthKeys();
+        //company = new Company(authKeyTable);
     }
 
     @Test

@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -17,7 +19,13 @@ import java.util.List;
 import java.util.Map;
 
 import java.awt.geom.Point2D;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+
 import bob.geunrobeol.platform.tech.config.WebSocketConfig;
+import bob.geunrobeol.platform.tech.dto.AuthKeyS;
 import bob.geunrobeol.platform.tech.vo.BeaconPosition;
 import bob.geunrobeol.platform.tech.vo.proc.BeaconRecord;
 import bob.geunrobeol.platform.tech.vo.raw.ScannerRecord;
@@ -31,6 +39,9 @@ public class LocationPublisher {
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
+
+    @Autowired
+    private ResourceLoader resourceLoader;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -62,14 +73,37 @@ public class LocationPublisher {
 
     public LocationPublisher() {
         this.thirdParty = new ThirdParty(accessAuthTable);
-        this.employees = new HashMap<>();
-        this.company = new Company(thirdParty.getAuthKeys());
 
+        
+        this.employees = new HashMap<>();
         for (String empData : employeeTable) {
             Employee e = thirdParty.addMember(empData);
             employees.put(e.id, e);
         }
+
+
+        //this.company = new Company(thirdParty.getAuthKeys());
+        // ThirdParty 인스턴스 데이터를 파일에서 읽어오기
+        List<AuthKeyS> authKeySList = readFromFile("classpath:xyz.txt", AuthKeyS.class);
+        // Company 객체 초기화
+        this.company = new Company(authKeySList);
     }
+
+    private <T> List<T> readFromFile(String filePath, Class<T> valueType) {
+        try {
+            Resource resource = resourceLoader.getResource(filePath);
+            InputStream inputStream = resource.getInputStream();
+
+            return objectMapper.readValue(inputStream, objectMapper.getTypeFactory().constructCollectionType(List.class, valueType));
+        } catch (FileNotFoundException e) {
+            return new ArrayList<>();
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading file: " + filePath, e);
+        }
+    }
+
+
+    
 
 
      /**
@@ -103,20 +137,18 @@ public class LocationPublisher {
 
             // 위험 구역 여부 판단
             if (isInDangerZone(positionPoint)) {
-                Employee employee = employees.get(r.getBeaconId()); //타입 수정해야
-                
+                //Employee employee = employees.get(r.getBeaconId()); //타입 수정해야
+                String sigText = "";
+                int authId = 0;
+
                 // 위험 구역 접근 권한 여부 판단
-                if (company.verifyAccessAuth(employee.signBeacon(), employee.authId)) {
-                    log.info("Employee with ID {} has access to the dangerous area.", employee.id);
-                } else {
-                    log.warn("Unauthorized access to dangerous area by employee with ID {}.", employee.id);
+                if (!company.verifyAccessAuth(employee.signBeacon(), employee.authId)) {
                     
                     // 위험 구역 접근 권한 없을 시 제3자에게 신원요청 
                     Map.Entry<String, String> identityInfo = thirdParty.open(employee.signBeacon());
                     log.info("Identity opened: {}, Log: {}", identityInfo.getKey(), identityInfo.getValue());
+                    log.warn("Unauthorized access to dangerous area by employee with ID {}.", employee.id);
 
-                    employee.appendOpenLog(identityInfo.getValue());
-                    company.appendIdentity(employee.signBeacon(), identityInfo.getKey());
                     log.info("open identity: {}", identityInfo.getKey());
                     log.info("open log: {}", identityInfo.getValue());
                 }

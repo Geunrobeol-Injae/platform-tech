@@ -16,6 +16,8 @@ import bob.geunrobeol.platform.tech.vo.raw.ScannerRecord;
  */
 public class BeaconRecord {
     private String beaconId;
+//어스키 아이디?
+
     private List<ScannerData> scanners;
     private Map<String, Integer> payloads;
 
