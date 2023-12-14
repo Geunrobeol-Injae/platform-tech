@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 
 import bob.geunrobeol.platform.tech.vo.BeaconWrapper;
 import bob.geunrobeol.platform.tech.vo.proc.BeaconRecord;
-import bob.geunrobeol.platform.tech.vo.proc.ScannerData;
 import bob.geunrobeol.platform.tech.vo.raw.BeaconData;
 import bob.geunrobeol.platform.tech.vo.raw.ScannerRecord;
 

@@ -122,7 +122,7 @@ public class LocationPublisher {
      * 위치정보 측위정보를 주기적으로 송신한다.
      * @see WebSocketConfig#WS_POSITION_DELAYS
      */
-    @Scheduled(fixedDelay = WebSocketConfig.WS_POSITION_DELAYS)
+    @Scheduled(fixedDelay = WebSocketConfig.WS_POSITION_DELAYS) 
     public void publishPositions() {
         List<BeaconRecord> records = locationPreprocessor.popBeaconRecord();
         List<BeaconPosition> positions = new ArrayList<>();

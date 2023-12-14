@@ -21,6 +21,8 @@ dependencies {
 	implementation("org.springframework:spring-messaging")
 	implementation("software.amazon.kinesis:amazon-kinesis-client:2.5.1")
 	implementation(files("./libs/libjgroupsig-1.0.0.jar"))
+	implementation("org.springframework.boot:spring-boot-starter-aop")
+
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
