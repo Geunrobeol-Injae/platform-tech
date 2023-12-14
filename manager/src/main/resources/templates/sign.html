@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup</title>
+    <style>
+hr {
+    margin: 1.5em 0;
+}
+
+#responseList {
+    width: calc(100% - 20px);
+    overflow: hidden;
+    margin: auto;
+}
+
+li {
+    margin: 1em 0;
+    border: 1px solid #ccc;
+    padding: 0.5em;
+}
+
+pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    background: #ededed;
+    padding: 1em;
+}
+</style>
+</head>
+<body>
+<h2>Setup Form</h2>
+
+<div id="accessAuthsContainer">
+    <h3>Access Auths</h3>
+    <button type="button" onclick="addAccessAuth()">Add Auth</button>
+</div>
+<hr>
+
+<div id="employeesContainer">
+    <h3>Employees</h3>
+    <button type="button" onclick="addEmployee()">Add Employee</button>
+</div>
+<hr>
+
+<button type="button" onclick="postData()">Submit</button>
+<hr>
+
+<div id="responseList">
+
+</div>
+
+<script>
+let accessAuthsCount = 1;
+let employeesCount = 1;
+
+function addAccessAuth() {
+    const container = document.getElementById("accessAuthsContainer");
+
+    const rowContainer = document.createElement("div");
+
+    const authIdInput = createInput(`accessAuths[${accessAuthsCount}].authId`, "Auth ID");
+    const zonesInput = createInput(`accessAuths[${accessAuthsCount}].zones`, "Zones");
+    const deleteButton = createDeleteButton(() => deleteItem(rowContainer));
+
+    rowContainer.appendChild(authIdInput);
+    rowContainer.appendChild(zonesInput);
+    rowContainer.appendChild(deleteButton);
+
+    container.appendChild(rowContainer);
+
+    accessAuthsCount++;
+}
+
+function addEmployee() {
+    const container = document.getElementById("employeesContainer");
+
+    const rowContainer = document.createElement("div");
+
+    const idInput = createInput(`employees[${employeesCount}].id`, "Employee ID");
+    const nameInput = createInput(`employees[${employeesCount}].name`, "Employee Name");
+    const authIdInput = createInput(`employees[${employeesCount}].authId`, "Employee Auth ID");
+    const deleteButton = createDeleteButton(() => deleteItem(rowContainer));
+
+    rowContainer.appendChild(idInput);
+    rowContainer.appendChild(nameInput);
+    rowContainer.appendChild(authIdInput);
+    rowContainer.appendChild(deleteButton);
+
+    container.appendChild(rowContainer);
+
+    employeesCount++;
+}
+
+function createInput(name, placeholder) {
+    const input = document.createElement("input");
+    input.type = "text";
+    input.name = name;
+    input.placeholder = placeholder;
+    return input;
+}
+
+function createDeleteButton(deleteFunction) {
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.textContent = "Delete";
+    deleteButton.addEventListener("click", deleteFunction);
+    return deleteButton;
+}
+
+function deleteItem(container) {
+    container.parentNode.removeChild(container);
+
+    // Update indices
+    updateIndices('accessAuthsContainer');
+    updateIndices('employeesContainer');
+}
+
+function updateIndices(containerId) {
+    const container = document.getElementById(containerId);
+    const items = container.querySelectorAll('div');
+
+    items.forEach((item, index) => {
+        const inputs = item.querySelectorAll('input');
+        inputs.forEach(input => {
+            const name = input.name;
+            const newName = name.replace(/\[\d+\]/, `[${index}]`);
+            input.name = newName;
+        });
+    });
+}
+
+function postData() {
+    const accessAuthsData = collectData('accessAuthsContainer', 'accessAuths');
+    const employeesData = collectData('employeesContainer', 'employees');
+
+    const setupData = {
+        accessAuths: accessAuthsData,
+        employees: employeesData
+    };
+
+    // Perform AJAX POST request
+    fetch('/setup', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(setupData),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Success:', data);
+        // Handle success response
+        displayResponses(data);
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        // Handle error
+    });
+}
+
+function collectData(containerId, type) {
+    const container = document.getElementById(containerId);
+    const items = container.querySelectorAll('div');
+    const data = [];
+
+    items.forEach(item => {
+        const itemData = {};
+        const inputs = item.querySelectorAll('input');
+
+        inputs.forEach(input => {
+            const fieldName = input.name.split('.')[1];
+            itemData[fieldName] = input.value;
+        });
+
+        data.push(itemData);
+    });
+
+    return data;
+}
+
+function displayResponses(data) {
+    const responseList = document.getElementById("responseList");
+    responseList.innerHTML = ""; // Clear existing responses
+
+    const sortedEntries = Object.entries(data).sort(([keyA], [keyB]) => keyB.localeCompare(keyA));
+
+    for (const [filename, fileContent] of sortedEntries) {
+        const listItem = document.createElement("li");
+
+        // Create header element
+        const header = document.createElement("b");
+        header.textContent = filename;
+        listItem.appendChild(header);
+
+        // Create content element
+        const content = document.createElement("pre");
+        content.textContent = JSON.stringify(fileContent);
+        listItem.appendChild(content);
+
+        responseList.appendChild(listItem);
+    }
+}
+</script>
+</body>
+</html>

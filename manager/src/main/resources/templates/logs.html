@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Open Log Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<h1>Log Viewer</h1>
+
+<table>
+    <thead>
+    <tr>
+        <th>Timestamp</th>
+        <th>Admin</th>
+        <th>Reason</th>
+        <th>Auth ID</th>
+        <th>Zones</th>
+        <th>Worker ID</th>
+        <th>Worker Name</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="log : ${logs}">
+        <td th:text="${log['timestamp']}"></td>
+        <td th:text="${log['adminId']}"></td>
+        <td th:text="${log['reason']}"></td>
+        <td th:text="${log['authId']}"></td>
+        <td th:text="${log['zones']}"></td>
+        <td th:text="${log['workerId']}"></td>
+        <td th:text="${log['workerName']}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
