@@ -17,3 +17,4 @@
 * [Won Gyeom](https://github.com/GyeomE)
 * [Suhyun Yun](https://github.com/yun-suhyun)
 * [Chaewon Lim](https://github.com/Chaewon-L)
+* [Jungu Kang](https://github.com/KJunGu)
