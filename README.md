@@ -16,3 +16,4 @@
 * [Hongrok Lim](https://hongroklim.github.io/)
 * [Won Gyeom](https://github.com/GyeomE)
 * [Suhyun Yun](https://github.com/yun-suhyun)
+* [Chaewon Lim](https://github.com/Chaewon-L)
