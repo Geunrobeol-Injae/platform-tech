@@ -18,3 +18,4 @@
 * [Suhyun Yun](https://github.com/yun-suhyun)
 * [Chaewon Lim](https://github.com/Chaewon-L)
 * [Jungu Kang](https://github.com/KJunGu)
+* [JiEun Park](https://github.com/rioju412)
